@@ -1,0 +1,9 @@
+SourceMod binaries: https://github.com/alliedmodders/sourcemod/releases/tag/1.12.0.7255
+SourceMod corresponding source: https://github.com/alliedmodders/sourcemod/tree/1.12.0.7255
+Clone with submodules at this tag when rebuilding SourceMod.
+MetaMod binaries: https://github.com/alliedmodders/metamod-source/releases/tag/1.12.0.1227
+MetaMod corresponding source: https://github.com/alliedmodders/metamod-source/tree/1.12.0.1227
+SourceMod license texts are included in tf/addons/sourcemod/.
+Bot Duel SourcePawn sources are included in tf/addons/sourcemod/scripting/.
+Listen-server loader requirement: https://wiki.alliedmods.net/Using_Metamod:Source_on_Listen_Servers
+Map: mge_oihguv_sucks_a12.bsp from the MGE materials provided for this project; filename and original map data preserved.
