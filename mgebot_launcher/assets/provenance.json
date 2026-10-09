@@ -1,0 +1,37 @@
+{
+  "logo.svg": {
+    "origin": "Original geometric mark authored in this project; GPL-3.0"
+  },
+  "fonts/": {
+    "source": "WLogs analysis/assets/fonts; Golos Text, Manrope, JetBrains Mono",
+    "license": "SIL OFL 1.1; bundled family license files",
+    "files": {
+      "OFL-jetbrainsmono.txt": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d",
+      "Manrope-SemiBold.ttf": "6bad1a774228464cc88b8b0271555b266f7a3c64a7bedf15e165fdab4f6ac0ce",
+      "OFL-manrope.txt": "e01b637272e0cbdfb240184dd98ea5cc671556d9894dae2668d92ab2c906787c",
+      "GolosText-Bold.ttf": "8b9ab44deba060e3f7a1a60bd2d8b19c4bab581e85c2e1f150a1e73a4f6aa8b4",
+      "GolosText-ExtraBold.ttf": "90c301a248ab2ef41a2ac82fccae3aa39485905f203be4adc9fe68bce5864059",
+      "OFL-golostext.txt": "ff532f9e8789f09a9fdffc3c0954eedfb0a48be77b2e2eb90f5f82e4f347f50c",
+      "Manrope-Regular.ttf": "a13d9b41b0a471ce58f0e46d377fa3cc76615e4632c3b15eb397caadf7a13f0a",
+      "JetBrainsMono-Regular.ttf": "44ce4a84f20d60f24539bd0cef11f79c29e38609e0f8adf18551c9794a5d9dc3"
+    }
+  },
+  "classes/": {
+    "source": "Existing WLogs analysis/assets/class/*.svg",
+    "subject": "Team Fortress 2 class symbols; Valve game assets",
+    "files": {
+      "heavy.svg": "2db34e08c03d1d39ff4354fbd90c80f8e3bf9dc06551fc81fb10ca3e532d01d3",
+      "soldier.svg": "fda7a4c2ac787bb630e3b60a70b3ce1de2998d7b3202884ab66e5d7528890c8c",
+      "engineer.svg": "4a789e145333db79ed7da846fc910c01f3509ef3819c712447affe83e73ca53d",
+      "demoman.svg": "4ddbb48427b717f0056261eac7a78e35d33416dba872156ae99338d0f00f53f4",
+      "medic.svg": "32604df6092395b1a25f0d822394872a0315ad174260c8db1cf15ab847776d25",
+      "spy.svg": "1950df683748b9bc793dcb0bf7764a08de307e65a734317e7aedbcdabbad478a",
+      "pyro.svg": "44fe17731d1e1e002a50b01ada75326fe71e518c3511ee3d828662158f04aa49",
+      "scout.svg": "5d43f2e1168268da368c370d57cad9d42cf3d35b8ea96da74b64db202f2a9e95",
+      "sniper.svg": "123914fa9b726691b581100a876686bd45696808570fd32ef19f6b99df13b879"
+    }
+  },
+  "icons/": {
+    "origin": "Original geometric UI symbols authored for the application; GPL-3.0"
+  }
+}

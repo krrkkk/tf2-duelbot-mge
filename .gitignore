@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+.impeccable/review/
+.impeccable/mocks/
+mgebot_launcher/payload/
+*.sq3
+connection.json
+install.lock

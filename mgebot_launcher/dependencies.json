@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "plugin_version": "5.1.2",
+  "map": "mge_triumph_beta7_rc1",
+  "dependencies": {
+    "windows": [
+      {
+        "name": "metamod-source",
+        "version": "1.12.0.1227",
+        "url": "https://github.com/alliedmodders/metamod-source/releases/download/1.12.0.1227/mmsource-1.12.0-git1227-windows.zip",
+        "sha256": "01a684249ad093ddee1c144fe7cdd25a7bf004466122cd32fdc722bf6f7d332a",
+        "size": 5367089,
+        "archive": "mmsource-1.12.0-git1227-windows.zip"
+      },
+      {
+        "name": "sourcemod",
+        "version": "1.12.0.7255",
+        "url": "https://github.com/alliedmodders/sourcemod/releases/download/1.12.0.7255/sourcemod-1.12.0-git7255-windows.zip",
+        "sha256": "9b8d049fee41ce8664d4aac3ed445c8fc6eef31d04c53277c1b4a5ed08ca5547",
+        "size": 67923495,
+        "archive": "sourcemod-1.12.0-git7255-windows.zip"
+      }
+    ],
+    "linux": [
+      {
+        "name": "metamod-source",
+        "version": "1.12.0.1227",
+        "url": "https://github.com/alliedmodders/metamod-source/releases/download/1.12.0.1227/mmsource-1.12.0-git1227-linux.tar.gz",
+        "sha256": "d70aa8e6b8c88a2a6ff770aadc8e070e8a331ae4fb91a019f3dc19d352c04f5e",
+        "size": 5049197,
+        "archive": "mmsource-1.12.0-git1227-linux.tar.gz"
+      },
+      {
+        "name": "sourcemod",
+        "version": "1.12.0.7255",
+        "url": "https://github.com/alliedmodders/sourcemod/releases/download/1.12.0.7255/sourcemod-1.12.0-git7255-linux.tar.gz",
+        "sha256": "02be752ddc25d344a379800df9395a2847ab85b71acea9167fdca8163010d5b9",
+        "size": 76231997,
+        "archive": "sourcemod-1.12.0-git7255-linux.tar.gz"
+      }
+    ]
+  },
+  "companion_version": "1.0.1"
+}

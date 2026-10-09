@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "python": "3.13.16",
+  "runtimes": {
+    "windows": {
+      "name": "python-3.13.16-embed-amd64.zip",
+      "url": "https://www.python.org/ftp/python/3.13.16/python-3.13.16-embed-amd64.zip",
+      "sha256": "97dae5274cc54867065e8d5a3226e48c35017ed332a0fdb0e27d5b5821961297",
+      "size": 11439094
+    },
+    "linux": {
+      "name": "cpython-3.13.16+20261003-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261003/cpython-3.13.16%2B20261003-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+      "sha256": "4595c5589fff7bf0cb158d9a88a797e0d791fa33830770fcb7bf3f4b104feeae",
+      "size": 35076205
+    }
+  },
+  "wheels": {
+    "windows": [
+      {
+        "name": "PyQt6-6.8.1-cp39-abi3-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/f2/69/11404cfcb916bd7207805c21432ecab0401779361d48b67f28ae9337f70d/PyQt6-6.8.1-cp39-abi3-win_amd64.whl",
+        "sha256": "70bad7b890a8f9e9e5fb9598c544b832d9d9d99a9519e0009cb29c1e15e96632",
+        "size": 6723466
+      },
+      {
+        "name": "PyQt6_Qt6-6.8.2-py3-none-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/1a/f7/31f03a9f5e6c7cc23ceb2bd0d9c2df0518837f7af0e693e15b6e0881b8b0/PyQt6_Qt6-6.8.2-py3-none-win_amd64.whl",
+        "sha256": "28e2bb641f05b01e498503c3ef01c8a919d6e0e96b50230301c0baac2b7d1433",
+        "size": 71934164
+      },
+      {
+        "name": "pyqt6_sip-13.10.2-cp313-cp313-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/89/63/e5adf350c1c3123d4865c013f164c5265512fa79f09ad464fb2fdf9f9e61/pyqt6_sip-13.10.2-cp313-cp313-win_amd64.whl",
+        "sha256": "0b097eb58b4df936c4a2a88a2f367c8bb5c20ff049a45a7917ad75d698e3b277",
+        "size": 53527
+      }
+    ],
+    "linux": [
+      {
+        "name": "PyQt6-6.8.1-cp39-abi3-manylinux_2_28_x86_64.whl",
+        "url": "https://files.pythonhosted.org/packages/be/25/a4392c323a0fb97eb5f449b7594f37e93d9794b900756b43cd65772def77/PyQt6-6.8.1-cp39-abi3-manylinux_2_28_x86_64.whl",
+        "sha256": "36bf48e3df3a6ff536e703315d155480ef4e260396eb5469eb7a875bc5bb7ab4",
+        "size": 8238120
+      },
+      {
+        "name": "PyQt6_Qt6-6.8.2-py3-none-manylinux_2_28_x86_64.whl",
+        "url": "https://files.pythonhosted.org/packages/92/95/0036435b9e2cbd22e08f14eec2362c32fc641660c6e4aea6f59d165cb5fc/PyQt6_Qt6-6.8.2-py3-none-manylinux_2_28_x86_64.whl",
+        "sha256": "fb6d0acdd7d43c33fb8b9d2dd7922d381cdedd00da316049fbe01fc1973e6f05",
+        "size": 81263397
+      },
+      {
+        "name": "pyqt6_sip-13.10.2-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.whl",
+        "url": "https://files.pythonhosted.org/packages/b0/1e/c6a28a142f14e735088534cc92951c3f48cccd77cdd4f3b10d7996be420f/pyqt6_sip-13.10.2-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.whl",
+        "sha256": "3dde8024d055f496eba7d44061c5a1ba4eb72fc95e5a9d7a0dbc908317e0888b",
+        "size": 303833
+      }
+    ]
+  },
+  "linux_extra": {
+    "name": "libxcb-cursor0_0.1.1-4ubuntu1_amd64.deb",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/universe/x/xcb-util-cursor/libxcb-cursor0_0.1.1-4ubuntu1_amd64.deb",
+    "sha256": "c9b5d1ad4af57397b1bd77e0a92750e34419def134c0282a0836ae9efc07cf64",
+    "size": 10538
+  }
+}
