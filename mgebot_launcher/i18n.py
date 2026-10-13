@@ -121,6 +121,52 @@ COPY.update({
 })
 
 
+COPY.update({
+    "bots_page": ("Настройки", "Training"), "bots_title": ("Тренируйся по своим правилам", "Make practice yours"),
+    "hero_ready": ("Ещё один раунд?", "One more round?"), "hero_install": ("Твоя арена. Твой темп.", "Your arena. Your pace."),
+    "hero_ready_note": ("Выбери арену, настрой соперника и начинай. Всё готово для тренировки на твоём компьютере.", "Pick an arena, tune your opponent and jump in. Your training runs on your computer."),
+    "hero_install_note": ("Карта, боты и компоненты — в одной установке. Играй один или позови друга на 2v2.", "Map, bots and components in one install. Train solo or bring a friend for 2v2."),
+    "mode_solo": ("1v1 · Один на один", "1v1 · Solo practice"), "mode_duo": ("2v2 · С напарником", "2v2 · With a teammate"),
+    "hero_duo": ("Вдвоём против ботов.", "Better with a teammate."),
+    "hero_duo_note": ("Создай комнату на своём компьютере и позови друга через Steam. Или добавь бота-напарника и играй сразу.", "Host a room on your computer and invite a Steam friend. Or add an AI teammate and play right away."),
+    "host_duo": ("Создать комнату 2v2", "Host 2v2"), "your_class": ("Твой класс", "Your class"),
+    "room_access": ("Кто может подключиться", "Who can join"),
+    "visibility_friends": ("Только друзья Steam", "Steam friends only"), "visibility_unlisted": ("По приглашению / адресу", "Unlisted · invite or address"), "visibility_listed": ("Все · показывать в списке серверов", "Anyone · list in server browser"),
+    "duo_round_live": ("Раунд {round} · живы {ours} : {theirs}", "Round {round} · alive {ours} : {theirs}"),
+    "duo_round_wait": ("Следующий раунд…", "Next round…"),
+    "duo_round_out": ("Вы выбиты до следующего раунда", "You are out until the next round"),
+    "duo_rules": ("До 20 побед · раунд до уничтожения команды", "First to 20 round wins · eliminate the entire team"),
+    "duo_settings_note": ("В 2v2 раунд заканчивается после гибели команды. Здесь — сложность и денай; тактика, свитчган и Gunboats доступны в игровом меню настроек ботов.", "A 2v2 round ends when a team is eliminated. Set difficulty and air deny here; tactics, switchgun and Gunboats are in the in-game bot settings."),
+    "duo_empty": ("Создай комнату. Пригласи друга или добавь бота-напарника.", "Host a room. Invite a friend or add an AI teammate."),
+    "duo_team_preview": ("Ты + друг или бот\nпротив двух ботов со случайными классами", "You + a friend or AI\nvs. two bots with random classes"),
+    "add_bot_teammate": ("Добавить бота-напарника", "Add an AI teammate"),
+    "adding_bot_teammate": ("Создаём команду…", "Creating your team…"),
+    "bot_teammate": ("Бот-напарник", "AI teammate"),
+    "waiting_partner": ("Комната создана · ждём напарника", "Room ready · waiting for your teammate"), "partner": ("Напарник", "Teammate"),
+    "invite_friend": ("Открыть друзей Steam", "Open Steam friends"),
+    "invite_note": ("Позови друга через Steam. Другу нужна та же карта — она есть в приложении. После входа: !add в чат → выбрать ту же арену. Комната работает, пока ты в игре.", "Invite your friend through Steam. Your friend needs the same map, included in this app. Once connected: !add in chat → choose the same arena. Keep your game open to host the room."),
+    "reaction": ("Реакция", "Reaction"), "aim_delay": ("Задержка прицела", "Aim delay"), "random_reaction": ("Случайный пресет на раунд", "Random preset each round"),
+    "reaction_note": ("Добавочная задержка поворота прицела. Пресет выбирается по весу; разброс задаёт случайное отклонение. Нулевые веса возвращают фиксированную задержку.", "Additional aim-turn delay. Each round picks a preset by weight; variation adds a random offset. Zero weights use the fixed delay."),
+    "shotgun_deny": ("Денай дробовиком в воздухе", "Shotgun air deny"),
+    "shotgun_deny_note": ("Разрешать солдату стрелять из дробовика по противнику в воздухе.", "Allow Soldier bots to use their shotgun against airborne opponents."),
+    "quickswitch": ("Быстрая смена после выстрела", "Switch weapons immediately after firing"), "quickswitch_note": ("Разрешать сразу переходить на вторичное оружие.", "Allow an immediate switch to the secondary weapon."),
+    "shotgun_stall": ("Вторичное вместо перезарядки", "Use secondary instead of reloading"), "shotgun_stall_note": ("Выключи, чтобы бот сначала дозарядил основное оружие.", "Turn off to make the bot finish reloading its primary first."),
+    "spawn_grace": ("Секунда перед стрельбой", "One-second spawn grace"), "spawn_grace_note": ("Пауза после появления: 1 с; при выключении — 0,5 с.", "Fire delay after spawning: 1 s, or 0.5 s when off."),
+    "wait_soldier": ("Солдат ждёт твоего действия", "Soldier waits for your move"), "wait_soldier_note": ("В дуэли двух солдатов бот ждёт твоего сближения, прыжка или выстрела.", "In Soldier-versus-Soldier practice, wait until you approach, jump or fire."),
+    "infinite_player": ("Моя неуязвимость", "Player invulnerability"), "infinite_bot": ("Неуязвимость бота", "Bot invulnerability"),
+    "infinite_health_note": ("Практика без обычного обучения тактик.", "Practice excluded from normal tactical learning."),
+    "ammo_policy": ("Правила патронов", "Ammo rules"), "individual_ammo": ("Отдельно для игрока и бота", "Individual player / bot toggles"), "infinite_ammo_both": ("Бесконечные у обоих", "Infinite for both"),
+    "respawn_sound": ("Звук возрождения MGE", "MGE respawn sound"), "respawn_sound_note": ("Оригинальный звук в точке появления игрока или бота.", "The original sound at the player's or bot's spawn position."),
+    "standard": ("Правила арены", "Arena rules"), "classic20": ("300 HP · до 20", "300 HP · first to 20"), "classic50": ("300 HP · до 50", "300 HP · first to 50"), "classic_unlimited": ("300 HP · без лимита", "300 HP · unlimited"),
+    "no_session": ("Начни тренировку. Здесь появятся счёт и здоровье участников.", "Start training to see the score and participant health."),
+    "select_game": ("Выбери папку TF2 в настройках приложения.", "Choose the TF2 folder in app settings."),
+})
+for _number in range(1, 4):
+    COPY[f"preset_{_number}_delay"] = (f"Пресет {_number} · задержка", f"Preset {_number} · delay")
+    COPY[f"preset_{_number}_jitter"] = (f"Пресет {_number} · разброс ±", f"Preset {_number} · variation ±")
+    COPY[f"preset_{_number}_weight"] = (f"Пресет {_number} · вес", f"Preset {_number} · weight")
+
+
 for _key, _values in tuple(COPY.items()):
     COPY[_key] = tuple(value if value.startswith(("TF2", "Team Fortress", "Steam", "SourceMod", "MetaMod", "Gunboats", "MGE", "HP", "DPM", "A/D", "Windows", "Linux", "JSON"))
                        else value[:1].lower() + value[1:] for value in _values)

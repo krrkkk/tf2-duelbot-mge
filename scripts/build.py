@@ -46,6 +46,7 @@ def main():
         raise SystemExit("Output directory is not empty; use a new build directory")
     if not args.runtime_only and (not args.payload or not args.payload.is_file()):
         raise SystemExit("A published, matching plugin platform archive is required")
+    sources = source_files()
     lock = json.loads((ROOT / "build-lock.json").read_text())
     runtime = lock["runtimes"][args.platform]
     assets = [runtime, *lock["wheels"][args.platform]]
@@ -81,8 +82,12 @@ def main():
         shutil.copyfile(library, output / "runtime/lib/libxcb-cursor.so.0")
         shutil.copyfile(extra / "usr/share/doc/libxcb-cursor0/copyright", output / "LICENSE-xcb-cursor.txt")
         shutil.rmtree(extra)
-    shutil.copytree(ROOT / "mgebot_launcher", output / "mgebot_launcher",
-                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "payload"))
+    for source in sources:
+        relative = source.relative_to(ROOT)
+        if relative.parts[0] == "mgebot_launcher":
+            target = output / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
     for name in ("run.py", "LICENSE", "THIRD_PARTY.md", "build-lock.json", "requirements.txt", "README.md", "README.ru.md", "CHANGELOG.md", "CHANGELOG.ru.md"):
         if (ROOT / name).exists():
             shutil.copy2(ROOT / name, output / name)
@@ -103,10 +108,10 @@ def main():
             raise SystemExit("A Windows-targeting MinGW-w64 compiler is required")
 
         environment = os.environ.copy(); environment["QT_QPA_PLATFORM"] = "offscreen"
-        icon_script = "from PyQt6.QtWidgets import QApplication; from PyQt6.QtGui import QImage,QPainter; from PyQt6.QtSvg import QSvgRenderer; import sys; app=QApplication([]); image=QImage(256,256,QImage.Format.Format_ARGB32); image.fill(0); painter=QPainter(image); QSvgRenderer(sys.argv[1]).render(painter); painter.end(); assert image.save(sys.argv[2])"
-        subprocess.run([sys.executable, "-c", icon_script, str(ROOT / "mgebot_launcher/assets/logo.svg"), str(output / "mgebot.ico")], env=environment, check=True)
+        icon_script = "from PyQt6.QtWidgets import QApplication; from PyQt6.QtGui import QImage; import sys; app=QApplication([]); image=QImage(sys.argv[1]); assert not image.isNull(); assert image.save(sys.argv[2])"
+        subprocess.run([sys.executable, "-c", icon_script, str(ROOT / "mgebot_launcher/assets/logo.webp"), str(output / "mgebot.ico")], env=environment, check=True)
         resource = output / "launcher.rc"
-        resource.write_text('1 ICON "mgebot.ico"\n1 VERSIONINFO\nFILEVERSION 0,2,2,0\nPRODUCTVERSION 0,2,2,0\nBEGIN\n BLOCK "StringFileInfo"\n BEGIN\n  BLOCK "040904B0"\n  BEGIN\n   VALUE "CompanyName", "avxgroup"\n   VALUE "FileDescription", "mgebot duel local companion"\n   VALUE "FileVersion", "0.2.2"\n   VALUE "ProductName", "mgebot duel"\n   VALUE "ProductVersion", "0.2.2"\n  END\n END\n BLOCK "VarFileInfo"\n BEGIN\n  VALUE "Translation", 0x409, 1200\n END\nEND\n')
+        resource.write_text(('1 ICON "mgebot.ico"\n1 VERSIONINFO\nFILEVERSION 0,2,2,0\nPRODUCTVERSION 0,2,2,0\nBEGIN\n BLOCK "StringFileInfo"\n BEGIN\n  BLOCK "040904B0"\n  BEGIN\n   VALUE "CompanyName", "avxgroup"\n   VALUE "FileDescription", "mgebot duel local companion"\n   VALUE "FileVersion", "0.2.2"\n   VALUE "ProductName", "mgebot duel"\n   VALUE "ProductVersion", "0.2.2"\n  END\n END\n BLOCK "VarFileInfo"\n BEGIN\n  VALUE "Translation", 0x409, 1200\n END\nEND\n').replace('0,2,2,0', ','.join(__version__.split('.') + ['0'])).replace('0.2.2', __version__))
         windres = shutil.which("x86_64-w64-mingw32-windres") or shutil.which("windres")
         if not windres:
             raise SystemExit("MinGW-w64 windres is required for the Windows icon/version resource")
@@ -131,7 +136,7 @@ def main():
               "developer_preview": args.runtime_only, "python": lock["python"], "plugin_payload_included": bool(args.payload),
               "plugin_sources_included": False, "credentials_included": False, "authenticode_signed": False,
               "packed_or_obfuscated": False, "files": files,
-              "source_files": {p.relative_to(ROOT).as_posix(): hashlib.sha256(public_bytes(p)).hexdigest() for p in source_files()}}
+              "source_files": {p.relative_to(ROOT).as_posix(): hashlib.sha256(public_bytes(p)).hexdigest() for p in sources}}
     (output / "MANIFEST.json").write_text(json.dumps(record, indent=2) + "\n")
     print(json.dumps({"build": str(output), "platform": args.platform, "files": len(files), "preview": args.runtime_only}), flush=True)
 

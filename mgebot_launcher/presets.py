@@ -130,19 +130,74 @@ class BotSettings:
 
 
 @dataclass(frozen=True)
+class PracticeSettings:
+    aim_delay: float = 0.0
+    random_reaction: bool = False
+    quickswitch: bool = True
+    shotgun_stall: bool = True
+    spawn_grace: bool = True
+    wait_soldier: bool = False
+    infinite_player: bool = False
+    infinite_bot: bool = False
+    ammo_policy: int = -1
+    preset_1_delay: float = 0.2
+    preset_1_jitter: float = 0.0
+    preset_1_weight: float = 0.6
+    preset_2_delay: float = 0.6
+    preset_2_jitter: float = 0.0
+    preset_2_weight: float = 0.3
+    preset_3_delay: float = 1.0
+    preset_3_jitter: float = 0.0
+    preset_3_weight: float = 0.1
+    respawn_sound: bool = True
+    shotgun_deny: bool = True
+
+    @classmethod
+    def parse(cls, data: Any) -> "PracticeSettings":
+        defaults = asdict(cls())
+        if not isinstance(data, dict) or set(data) - set(defaults):
+            raise ValueError("Unsupported practice settings")
+        for name, value in data.items():
+            kind = type(defaults[name])
+            if kind is float:
+                step = 0.1 if name.endswith("weight") else 0.2
+                if type(value) not in (int, float) or not math.isfinite(value) or not 0 <= value <= 1 or abs(value / step - round(value / step)) > 0.00001:
+                    raise ValueError(f"Invalid practice value: {name}")
+                value = round(float(value), 1)
+            elif type(value) is not kind:
+                raise ValueError(f"Invalid practice type: {name}")
+            defaults[name] = value
+        if defaults["ammo_policy"] not in (-1, 0, 1):
+            raise ValueError("Invalid ammo policy")
+        return cls(**defaults)
+
+    def to_keyvalues(self, player_class: int = 3) -> str:
+        checked = self.parse(asdict(self))
+        if type(player_class) is not int or player_class not in (1, 3, 4):
+            raise ValueError("2v2 supports Scout, Soldier and Demoman")
+        lines = ['"MGBotPractice"', '{', '    "version" "1"', f'    "player_class" "{player_class}"']
+        for name, value in asdict(checked).items():
+            lines.append(f'    "{name}" "{int(value) if isinstance(value, bool) else value}"')
+        return "\n".join(lines + ['}', ''])
+
+
+@dataclass(frozen=True)
 class Preset:
     id: str
     name: str
     settings: BotSettings
     session_settings: SessionSettings = SessionSettings()
+    practice_settings: PracticeSettings = PracticeSettings()
 
     @classmethod
     def parse(cls, data: Any) -> "Preset":
-        if not isinstance(data, dict) or data.get("version") not in (1, 2):
+        if not isinstance(data, dict) or data.get("version") not in (1, 2, 3):
             raise ValueError("Unsupported preset format")
         expected = {"version", "id", "name", "settings"}
-        if data["version"] == 2:
+        if data["version"] >= 2:
             expected.add("session_settings")
+        if data["version"] == 3:
+            expected.add("practice_settings")
         if set(data) != expected:
             raise ValueError("Unsupported preset fields")
         if not isinstance(data["id"], str) or not re.fullmatch(r"[a-f0-9]{32}", data["id"]):
@@ -150,10 +205,10 @@ class Preset:
         name = data["name"]
         if not isinstance(name, str) or not name.strip() or len(name) > 80 or any(ord(c) < 32 for c in name):
             raise ValueError("Preset name must contain 1–80 printable characters")
-        return cls(data["id"], name.strip(), BotSettings.parse(data["settings"]), SessionSettings.parse(data.get("session_settings", {})))
+        return cls(data["id"], name.strip(), BotSettings.parse(data["settings"]), SessionSettings.parse(data.get("session_settings", {})), PracticeSettings.parse(data.get("practice_settings", {})))
 
     def document(self) -> dict[str, Any]:
-        return {"version": 2, "id": self.id, "name": self.name, "settings": asdict(self.settings), "session_settings": asdict(self.session_settings)}
+        return {"version": 3, "id": self.id, "name": self.name, "settings": asdict(self.settings), "session_settings": asdict(self.session_settings), "practice_settings": asdict(self.practice_settings)}
 
 
 class PresetStore:
@@ -166,16 +221,16 @@ class PresetStore:
         return sorted((Preset.parse(read_json(p)) for p in self.directory.glob("*.json")), key=lambda p: p.name.casefold())
 
     def save(self, name: str, settings: BotSettings, identifier: str | None = None,
-             session_settings: SessionSettings | None = None) -> Preset:
-        p = Preset.parse({"version": 2, "id": identifier or uuid.uuid4().hex, "name": name, "settings": asdict(settings),
-                          "session_settings": asdict(session_settings or SessionSettings())})
+             session_settings: SessionSettings | None = None, practice_settings: PracticeSettings | None = None) -> Preset:
+        p = Preset.parse({"version": 3, "id": identifier or uuid.uuid4().hex, "name": name, "settings": asdict(settings),
+                          "session_settings": asdict(session_settings or SessionSettings()), "practice_settings": asdict(practice_settings or PracticeSettings())})
         write_json(self.directory / (p.id + ".json"), p.document())
         return p
 
     def import_file(self, path: Path) -> Preset:
         imported = Preset.parse(read_json(path))
 
-        return self.save(imported.name, imported.settings, session_settings=imported.session_settings)
+        return self.save(imported.name, imported.settings, session_settings=imported.session_settings, practice_settings=imported.practice_settings)
 
     def export_file(self, preset: Preset, path: Path) -> None:
         write_json(path, Preset.parse(preset.document()).document())

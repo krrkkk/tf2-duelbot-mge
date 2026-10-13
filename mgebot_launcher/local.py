@@ -63,7 +63,7 @@ class FileConnection:
         if len(parts) < 2 or parts[0] != "sm_duel_local":
             raise ValueError("Only the typed local training API is available")
         operation, arguments = parts[1], parts[2:]
-        sizes = {"status": 0, "players": 0, "arenas": 0, "snapshot": 1, "stop": 1, "apply": 2, "start": 3}
+        sizes = {"status": 0, "players": 0, "arenas": 0, "snapshot": 1, "stop": 1, "apply": 2, "start": 3, "duo": 3, "duo_apply": 2, "duo_bot": 1}
         if operation not in sizes or len(arguments) != sizes[operation]:
             raise ValueError("Invalid local operation")
         with self._lock:
@@ -75,11 +75,11 @@ class FileConnection:
                 if not arguments[0].isdigit() or int(arguments[0]) <= 0:
                     raise ValueError("Invalid local player")
                 values["userid"] = arguments[0]
-            if operation == "start":
+            if operation in ("start", "duo"):
                 if not arguments[1].isdigit() or not 1 <= int(arguments[1]) <= 256:
                     raise ValueError("Invalid arena")
                 values["arena"] = arguments[1]
-            if operation in ("apply", "start"):
+            if operation in ("apply", "start", "duo", "duo_apply"):
                 if not re.fullmatch(r"[a-f0-9]{32}", arguments[-1]):
                     raise ValueError("Invalid preset identifier")
                 values["preset"] = arguments[-1]

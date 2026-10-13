@@ -214,7 +214,7 @@ def payload_files(directory: Path, platform: str) -> tuple[dict[str, Path], dict
 def local_config(password: str, port: int) -> bytes:
     if not password or any(c not in "0123456789abcdef" for c in password) or not 1024 <= port <= 65535:
         raise ValueError("Invalid generated local configuration")
-    return ("con_logfile mgebot-console.log\nsv_lan 1\n" + f'rcon_password "{password}"\n'
+    return ("con_logfile mgebot-console.log\nexec mgebot-network\n" + f'rcon_password "{password}"\n'
             "mp_timelimit 0\nmp_autoteambalance 0\nmp_teams_unbalance_limit 0\n"
             "mp_idledealmethod 0\nmp_disable_respawn_times 1\nmp_waitingforplayers_time 0\nmp_waitingforplayers_restart 0\n"
             "mp_tournament 0\nmp_enableroundwaittime 0\nmp_waitingforplayers_cancel 1\n"
@@ -233,8 +233,8 @@ class Installer:
         tf = validate_tf_directory(tf_directory)
         if platform not in ("windows", "linux"):
             raise ValueError("Unsupported platform")
-        if self.process_check() and not allow_running_local:
-            raise RuntimeError("Close TF2 and local TF2 servers before installing")
+        if self.process_check():
+            raise RuntimeError("Close TF2 and local TF2 servers before installing; live plugin replacement is disabled")
         root = tf.parent
         self.app_data.mkdir(parents=True, exist_ok=True)
         with installation_lock(self.app_data / "install.lock"):
@@ -316,10 +316,7 @@ class Installer:
                 if cancel.is_set():
                     raise Cancelled("Installation cancelled")
                 if self.process_check():
-                    live_safe = {"tf/addons/sourcemod/plugins/mgebot_companion.smx", "tf/addons/sourcemod/plugins/mge_botduel.smx",
-                                 "tf/addons/sourcemod/configs/mgebot_companion.cfg", "tf/cfg/mgebot-launcher.cfg", "tf/cfg/mgebot-launcher-refresh.cfg"}
-                    if not allow_running_local or any(item["path"] not in live_safe for item in planned):
-                        raise RuntimeError("Close TF2 to update its runtime components; your existing setup is preserved")
+                    raise RuntimeError("TF2 started during installation. Close it before updating; no live plugin replacement is allowed")
                 free = shutil.disk_usage(root).free
                 needed = sum(p["source"].stat().st_size * 2 for p in planned) + 32 * 1024 * 1024
                 if free < needed:

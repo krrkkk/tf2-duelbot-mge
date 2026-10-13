@@ -57,3 +57,12 @@ QMenu::item { padding:9px 20px; }
 QMenu::item:selected { background:#38294a; }
 QDialog,QMessageBox { background:#15111c; }
 """
+
+STYLESHEET += """
+QWidget#PlayContent { background:#0b0b0e; }
+QLabel#TeamState { font-family:'Golos Text'; font-size:18px; color:#d7c8ff; padding:12px 0; }
+QFrame#Hero { background:#171220; border:1px solid #4b375f; border-radius:16px; }
+QFrame#Panel { background:#131017; border:1px solid #302738; }
+QLabel#HeroTitle { font-size:34px; }
+QLabel#Title { font-size:28px; }
+"""

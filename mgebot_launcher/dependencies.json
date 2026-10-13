@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "plugin_version": "5.1.2",
+  "plugin_version": "5.2.4",
   "map": "mge_triumph_beta7_rc1",
   "dependencies": {
     "windows": [
@@ -14,11 +14,11 @@
       },
       {
         "name": "sourcemod",
-        "version": "1.12.0.7255",
-        "url": "https://github.com/alliedmodders/sourcemod/releases/download/1.12.0.7255/sourcemod-1.12.0-git7255-windows.zip",
-        "sha256": "9b8d049fee41ce8664d4aac3ed445c8fc6eef31d04c53277c1b4a5ed08ca5547",
-        "size": 67923495,
-        "archive": "sourcemod-1.12.0-git7255-windows.zip"
+        "version": "1.13.0.7441",
+        "url": "https://github.com/alliedmodders/sourcemod/releases/download/1.13.0.7441/sourcemod-1.13.0-git7441-windows.zip",
+        "sha256": "5194d2fbb3f94377dabad59ea3236321c5814875527ddf00c55a82b392e88909",
+        "size": 67530259,
+        "archive": "sourcemod-1.13.0-git7441-windows.zip"
       }
     ],
     "linux": [
@@ -40,5 +40,5 @@
       }
     ]
   },
-  "companion_version": "1.0.1"
+  "companion_version": "1.1.1"
 }

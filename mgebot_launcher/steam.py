@@ -201,14 +201,39 @@ def running_games() -> list[GameProcess]:
     return result
 
 
+def hosting_config(visibility: str) -> bytes:
+    if visibility not in ("local", "friends", "unlisted", "listed"):
+        raise ValueError("Unsupported room visibility")
+    return (f"sv_lan {int(visibility == 'local')}\n"
+            f"sv_use_steam_networking {int(visibility != 'local')}\n"
+            f"sv_friends_only {int(visibility in ('local', 'friends'))}\n"
+            f"sv_allow_server_adverisement_to_master_server {int(visibility == 'listed')}\n"
+            "maxplayers 16\n").encode()
+
+
+def hosting_matches(visibility: str, state: dict) -> bool:
+    if visibility == "local":
+        return state.get("lan") is True and state.get("steam_networking") is False
+    if visibility not in ("friends", "unlisted", "listed"):
+        return False
+    return (state.get("lan") is False and state.get("steam_networking") is True
+            and state.get("friends_only") is (visibility == "friends")
+            and state.get("listed") is (visibility == "listed"))
+
+
 def launch_training(port: int, map_name: str = "mge_triumph_beta7_rc1", tf_directory: Path | None = None,
-                    existing: GameProcess | None = None, bootstrap_only: bool = False, refresh: bool = False) -> None:
+                    existing: GameProcess | None = None, bootstrap_only: bool = False, refresh: bool = False, visibility: str = "local") -> None:
+    network = hosting_config(visibility)
     if not 1024 <= port <= 65535 or not re.fullmatch(r"[a-z0-9_]+", map_name):
         raise ValueError("Invalid local launch configuration")
     if tf_directory is not None:
         marker = tf_directory / "addons/sourcemod/data/mgebot_companion/launch.cfg"
         if marker.parent.is_symlink() or not marker.parent.resolve().is_relative_to(tf_directory.resolve()):
             raise ValueError("Local training files must stay inside the selected TF2 folder")
+        config = tf_directory / "cfg/mgebot-network.cfg"
+        if config.is_symlink() or not config.parent.resolve().is_relative_to(tf_directory.resolve()):
+            raise ValueError("Network configuration must stay inside the selected TF2 folder")
+        atomic_bytes(config, network)
         atomic_bytes(marker, ('"MGBotLaunch"\n{\n    "created" "'+str(int(time.time()))+'"\n}\n').encode())
     if existing is not None:
         if existing.insecure is not True:
@@ -217,7 +242,9 @@ def launch_training(port: int, map_name: str = "mge_triumph_beta7_rc1", tf_direc
             raise RuntimeError("The running TF2 uses a different game folder")
         if not existing.executable:
             raise RuntimeError("The running TF2 executable could not be identified")
-        arguments = [existing.executable, "-hijack", "-console"]
+        if visibility != "local" and re.search(r"(?:^|\s)-ip\s+127\.0\.0\.1(?:\s|$)", existing.command_line):
+            raise RuntimeError("Close TF2 once and start 2v2 from the app: the previous launch was restricted to this computer")
+        arguments = [existing.executable, "-hijack", "-console", "+exec", "mgebot-network"]
         if not bootstrap_only:
             arguments += ["+map", map_name]
         arguments += ["+exec", "mgebot-launcher-refresh" if refresh else "mgebot-launcher"]
@@ -230,7 +257,7 @@ def launch_training(port: int, map_name: str = "mge_triumph_beta7_rc1", tf_direc
         executable = next((str(p / "steam.exe") for p in steam_roots() if (p / "steam.exe").is_file()), None)
     else:
         executable = shutil.which("steam")
-    args = ["-applaunch", "440", "-insecure", "-console", "-condebug", "-ip", "127.0.0.1", "-port", str(port),
+    args = ["-applaunch", "440", "-insecure", "-console", "-condebug", "-port", str(port), "+exec", "mgebot-network",
             "+map", map_name, "+exec", "mgebot-launcher"]
     environment = _steam_environment()
     if executable:

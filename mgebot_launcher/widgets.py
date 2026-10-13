@@ -37,10 +37,14 @@ class ActionButton(QPushButton):
         self.update()
 
     def enterEvent(self, event):
+        if not getattr(self.window(), "motion", True):
+            self.animation.stop(); self.hover = 1.0; self.update(); return super().enterEvent(event)
         self.animation.stop(); self.animation.setStartValue(self.hover); self.animation.setEndValue(1.0); self.animation.start()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
+        if not getattr(self.window(), "motion", True):
+            self.animation.stop(); self.hover = 0.0; self.update(); return super().leaveEvent(event)
         self.animation.stop(); self.animation.setStartValue(self.hover); self.animation.setEndValue(0.0); self.animation.start()
         super().leaveEvent(event)
 
@@ -271,6 +275,6 @@ class WelcomeReveal(QWidget):
         glow.setColorAt(0, QColor("#241934")); glow.setColorAt(1, QColor("#0b0b0e")); p.fillRect(self.rect(), glow)
         arrival = 1.0 - pow(1.0 - min(1.0, self.progress / .6), 4)
         p.setOpacity(fade * arrival)
-        QIcon(str(ASSETS / "logo.svg")).paint(p, center.x() - 38, round(center.y() - 80 + (1 - arrival) * 14), 76, 76)
+        QIcon(str(ASSETS / "logo.webp")).paint(p, center.x() - 38, round(center.y() - 80 + (1 - arrival) * 14), 76, 76)
         p.setFont(QFont("Golos Text", 26, QFont.Weight.ExtraBold)); p.setPen(QColor("#ededf2"))
         p.drawText(QRectF(0, center.y() + 16, self.width(), 58), Qt.AlignmentFlag.AlignCenter, "mgebot duel")

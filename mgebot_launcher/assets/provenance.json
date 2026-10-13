@@ -33,5 +33,9 @@
   },
   "icons/": {
     "origin": "Original geometric UI symbols authored for the application; GPL-3.0"
+  },
+  "logo.webp": {
+    "origin": "Operator-provided logo; received 2026-10-13. Used without visual edits.",
+    "sha256": "638c67ee684d59fab2f7d342d62cd7b116e566d0f6be2426d00e8cc90e14cd5b"
   }
 }

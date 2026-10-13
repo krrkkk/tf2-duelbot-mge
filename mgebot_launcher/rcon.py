@@ -70,7 +70,7 @@ class LocalConnection:
             raise ValueError("Local server response did not finish")
 
     def api(self, operation: str, *arguments: int | str) -> dict[str, Any]:
-        if operation not in {"status", "players", "arenas", "snapshot", "apply", "start", "stop"}:
+        if operation not in {"status", "players", "arenas", "snapshot", "apply", "start", "stop", "duo", "duo_apply", "duo_bot"}:
             raise ValueError("Unsupported local operation")
         values = []
         for argument in arguments:

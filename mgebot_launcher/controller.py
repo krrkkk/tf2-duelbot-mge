@@ -13,12 +13,11 @@ from PyQt6.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal
 
 from .downloads import Cancelled, digest
 from .crashlog import start_watch
-from .history import read_sessions
 from .installer import Installer
 from .local import FileConnection, LocalNotReady, load_file_connection
-from .presets import BotSettings, SessionSettings
+from .presets import BotSettings, SessionSettings, PracticeSettings
 from .steam import (find_tf_directories, launch_training, parse_vdf,
-                    running_games, validate_tf_directory)
+                    running_games, validate_tf_directory, hosting_matches)
 from .storage import atomic_bytes, read_json, write_json
 
 
@@ -65,7 +64,7 @@ class Controller(QObject):
         window.apply_requested.connect(self.apply)
         window.launch_requested.connect(self.launch)
         window.stop_requested.connect(self.stop)
-        window.history_requested.connect(self.history)
+        window.teammate_requested.connect(self.add_teammate)
         self.timer = QTimer(self); self.timer.setInterval(1600); self.timer.timeout.connect(self.tick)
         if not demo:
             self.timer.start(); QTimer.singleShot(0, self.discover)
@@ -88,7 +87,6 @@ class Controller(QObject):
         if self.demo or self.window.busy: return
         if time.monotonic() - self.last_discovery > 10: self.discover()
         self.poll()
-        if self.window.online and time.monotonic() - self.last_history > 12: self.history()
 
     def change_directory(self, directory):
         self.generation += 1; self.userid = 0; self.connection = None; self.pending_launch = None
@@ -100,6 +98,7 @@ class Controller(QObject):
     def _installed(self, tf):
         if not self.payload_manifest or not load_file_connection(tf): return False
         critical = ["tf/addons/sourcemod/plugins/mge_botduel.smx", "tf/addons/sourcemod/plugins/mgebot_companion.smx"]
+        critical += ["tf/addons/sourcemod/configs/" + name for name in ("botduel_movement.cfg", "botduel_air.cfg", "botduel_team_movement.cfg")]
         for name in critical:
             spec = self.payload_manifest.get("files", {}).get(name); path = tf.parent / name
             if not spec or not path.is_file() or digest(path) != spec["sha256"]: return False
@@ -133,7 +132,7 @@ class Controller(QObject):
                 if connection and (not self.connection or self.connection.installation != connection.installation or self.connection.tf_directory != tf):
                     self.connection = connection
                 if changed:
-                    self._offline_arenas(); self.history(); self.window._save_preferences()
+                    self._offline_arenas(); self.window._save_preferences()
             if not self.window.online and not self.pending_launch:
                 if not tf: self.window.set_connection_state("missing_game")
                 elif not ready: self.window.set_connection_state("not_installed")
@@ -149,7 +148,7 @@ class Controller(QObject):
         try:
             document = parse_vdf(file.read_text(encoding="utf-8-sig")); maps = next(iter(document.values()))
             arenas = maps.get(self.catalog["map"], {})
-            self.window.set_arenas([{"id": i + 1, "name": str(value.get("name", name)), "occupied": False}
+            self.window.set_arenas([{"id": i + 1, "name": str(value.get("name", name)), "occupied": False, "duo": len([k for k in value if str(k).isdigit()]) >= 4 and str(value.get("endif", "0")) == "0" and str(value.get("midair", "0")) == "0" and (not value.get("classes") or {"scout", "soldier", "demoman"}.issubset(str(value["classes"]).lower().split()))}
                                    for i, (name, value) in enumerate(arenas.items()) if isinstance(value, dict)])
         except (OSError, ValueError, AttributeError, StopIteration): pass
 
@@ -158,7 +157,7 @@ class Controller(QObject):
         if not self.window.install_ready:
             if not self.window.game_directory and not self.window._pick_directory(): return
             self.install(self.window.game_directory, self.window.payload); return
-        if self.window.online and self.window.last_snapshot.get("active"):
+        if self.window.online and (self.window.last_snapshot.get("active") or self.window.last_snapshot.get("team", {}).get("hosting")):
             return
         self.launch(self.window.settings(), int(self.window.arena_box.currentData() or 0))
 
@@ -171,7 +170,7 @@ class Controller(QObject):
         except (ValueError, OSError) as error: self.error(error); return
         self.cancel.clear(); self.window.set_busy(True)
         game = self.game
-        live = bool(game and game.insecure is True and game.tf_directory == tf)
+        live = False
         installer = Installer(self.data, self.catalog)
         def installed(result):
             self.tf_directory = tf; self.window.game_directory = str(tf); self.runtime_mismatch = False
@@ -219,12 +218,16 @@ class Controller(QObject):
                 try:
                     self.window.set_settings(BotSettings.parse(snapshot["settings"]))
                     if snapshot.get("session_settings"): self.window.set_session_settings(SessionSettings.parse(snapshot["session_settings"]))
+                    if snapshot.get("practice_settings"): self.window.set_practice_settings(PracticeSettings.parse(snapshot["practice_settings"]))
                 except ValueError as error: self.error(error)
+            if self.pending_launch and player and not hosting_matches(self.pending_launch["visibility"], snapshot.get("hosting") or {}):
+                self.last_error = "Waiting for the selected Steam Networking visibility"
+                self.window.set_connection_state("starting"); self._pending_tick(); return
             if self.pending_launch and player:
                 pending = self.pending_launch; self.pending_launch = None
                 self.window.set_launch_pending(False)
                 arena = pending["arena"] or next((a["id"] for a in self.window.arenas if not a.get("occupied")), 0)
-                self._apply(pending["settings"], arena, pending["environment"])
+                self._apply(pending["settings"], arena, pending["environment"], pending["practice"], pending["mode"], pending["player_class"])
             elif self.pending_launch:
                 self._pending_tick(allow_bootstrap=False)
         def disconnected(error):
@@ -248,31 +251,35 @@ class Controller(QObject):
 
         if allow_bootstrap and pending.get("bootstrap") and now - pending["started"] > 3.5 and self.game:
             pending["bootstrap"] = False
-            self.submit(lambda progress: launch_training(27025, self.catalog["map"], self.tf_directory, self.game))
+            self.submit(lambda progress: launch_training(27025, self.catalog["map"], self.tf_directory, self.game, visibility=pending["visibility"]))
 
-    def _apply(self, settings: BotSettings, arena: int | None = None, environment: SessionSettings | None = None):
+    def _apply(self, settings: BotSettings, arena: int | None = None, environment: SessionSettings | None = None, practice=None, mode=None, player_class=None):
         if not self.connection or not self.userid:
             self.window.notify(self.window.t("connect_first"), True); return
         if self.action_busy or self.demo: return
         self.action_busy = True; self.window.set_action_busy(True)
         environment = environment or self.window.session_settings(); userid = self.userid
+        practice = practice or self.window.practice_settings(); mode = mode or self.window.mode
+        player_class = player_class or self.window.host_class
         connection = self.connection; tf = self.tf_directory; generation = self.generation
         def work(progress):
             if tf is None or connection.tf_directory != tf: raise ValueError("The selected TF2 installation changed")
             identifier = uuid.uuid4().hex; directory = tf / "addons/sourcemod/configs/botduel_local"
             if directory.is_symlink() or not directory.resolve().is_relative_to(tf): raise ValueError("Preset directory is outside TF2")
             file = directory / (identifier + ".cfg"); session = directory / (identifier + "-session.cfg")
+            practice_file = directory / (identifier + "-practice.cfg")
             atomic_bytes(file, settings.to_keyvalues().encode()); atomic_bytes(session, environment.to_keyvalues().encode())
+            atomic_bytes(practice_file, practice.to_keyvalues(player_class).encode())
             try:
                 if arena is not None:
                     if arena <= 0: raise ValueError(self.window.t("arena_pending"))
-                    return connection.api("start", userid, arena, identifier)
-                return connection.api("apply", userid, identifier)
+                    return connection.api("duo" if mode == "duo" else "start", userid, arena, identifier)
+                return connection.api("duo_apply" if mode == "duo" else "apply", userid, identifier)
             finally:
-                file.unlink(missing_ok=True); session.unlink(missing_ok=True)
+                file.unlink(missing_ok=True); session.unlink(missing_ok=True); practice_file.unlink(missing_ok=True)
         def done(result):
             if generation != self.generation: return
-            self.window.mark_dirty(self.window.settings() != settings or self.window.session_settings() != environment)
+            self.window.mark_dirty(self.window.settings() != settings or self.window.session_settings() != environment or self.window.practice_settings() != practice or self.window.mode != mode or self.window.host_class != player_class)
             self.window.notify(self.window.t("restarted") if result.get("restarted") else self.window.t("applied"))
         def finished():
             self.action_busy = False; self.window.set_action_busy(False); QTimer.singleShot(100, self.poll)
@@ -282,14 +289,17 @@ class Controller(QObject):
 
     def launch(self, settings, arena):
         if self.demo or self.action_busy or self.pending_launch: return
-        if self.connection and self.userid and self.window.online:
+        visibility = self.window.visibility if self.window.mode == "duo" else "local"
+        hosting = self.window.last_snapshot.get("hosting") or {}
+        network_ready = hosting_matches(visibility, hosting)
+        if self.connection and self.userid and self.window.online and network_ready:
             self._apply(settings, arena); return
         if not self.connection or not self.tf_directory:
             self.window._select_page(0); self.window.notify(self.window.t("select_game"), True); return
         game = self.game
         if game and game.insecure is not True:
             self.window.set_connection_state("secure_game"); self.window.notify(self.window.t("local_launch_note"), True); return
-        self.pending_launch = {"settings": settings, "environment": self.window.session_settings(), "arena": arena,
+        self.pending_launch = {"settings": settings, "environment": self.window.session_settings(), "arena": arena, "practice": self.window.practice_settings(), "mode": self.window.mode, "player_class": self.window.host_class, "visibility": visibility,
                                "deadline": time.monotonic() + 120, "started": time.monotonic(), "bootstrap": bool(game)}
         self.window.set_launch_pending(True)
         self.window.set_connection_state("starting")
@@ -297,19 +307,23 @@ class Controller(QObject):
         except OSError as error: logging.warning("TF2 crash recorder: %s", error)
         def failed(error):
             self.pending_launch = None; self.window.set_launch_pending(False); self.window.set_connection_state("error", str(error)); self.error(error)
-        self.submit(lambda progress: launch_training(27025, self.catalog["map"], self.tf_directory, game, bootstrap_only=bool(game)),
+        self.submit(lambda progress: launch_training(27025, self.catalog["map"], self.tf_directory, game, bootstrap_only=False, visibility=visibility),
                     lambda _: QTimer.singleShot(400, self.poll), failed)
+
+    def add_teammate(self):
+        team = self.window.last_snapshot.get("team") or {}
+        if self.demo or self.action_busy or not self.connection or not self.userid or not team.get("hosting") or not team.get("waiting"): return
+        self.action_busy = True; self.window.set_action_busy(True)
+        userid = self.userid; connection = self.connection; generation = self.generation
+        def done(result):
+            if generation == self.generation: self.window.show_snapshot(result)
+        def finished():
+            self.action_busy = False; self.window.set_action_busy(False); QTimer.singleShot(100, self.poll)
+        self.submit(lambda progress: connection.api("duo_bot", userid), done, finished=finished)
 
     def stop(self):
         if self.demo or self.action_busy or not self.connection or not self.userid: return
         self.action_busy = True; self.window.set_action_busy(True); userid = self.userid; connection = self.connection
         def finished():
-            self.action_busy = False; self.window.set_action_busy(False); QTimer.singleShot(100, self.poll); QTimer.singleShot(300, self.history)
+            self.action_busy = False; self.window.set_action_busy(False); QTimer.singleShot(100, self.poll)
         self.submit(lambda progress: connection.api("stop", userid), finished=finished)
-
-    def history(self):
-        if self.demo or self.history_busy or not self.tf_directory: return
-        self.history_busy = True; self.last_history = time.monotonic(); directory = self.tf_directory; generation = self.generation
-        def received(rows):
-            if generation == self.generation: self.window.show_history(rows)
-        self.submit(lambda progress: read_sessions(directory), received, finished=lambda: setattr(self, "history_busy", False))

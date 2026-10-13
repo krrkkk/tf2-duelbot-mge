@@ -9,3 +9,8 @@ mgebot_launcher/payload/
 *.sq3
 connection.json
 install.lock
+*.log
+*.dmp
+*.sqlite*
+.env*
+crashlogs/

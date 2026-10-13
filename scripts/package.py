@@ -16,6 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_FILES = (".gitignore", "LICENSE", "README.md", "README.ru.md", "CHANGELOG.md", "CHANGELOG.ru.md", "THIRD_PARTY.md",
                 "requirements.txt", "build-lock.json", "run.py")
 SOURCE_DIRECTORIES = ("mgebot_launcher", "scripts", "tests", ".github/workflows")
+PRIVATE_NAMES = {"review.py", "test_review.py", "feedback.svg", "connection.json", "ui.json",
+                 "last-session.json", "last-heartbeat.json", "install.lock"}
+PRIVATE_SUFFIXES = {".sp", ".inc", ".sq3", ".sqlite", ".sqlite3", ".db", ".smx", ".bsp",
+                    ".log", ".dmp", ".dump", ".key", ".pem"}
 
 
 def digest(path: Path) -> str:
@@ -30,9 +34,13 @@ def source_files() -> list[Path]:
             parts = path.relative_to(ROOT).parts
             if not path.is_file() or {"__pycache__", "payload"}.intersection(parts) or path.suffix in (".pyc", ".pyo"):
                 continue
-            if path.is_symlink() or path.suffix.casefold() in (".sp", ".inc", ".sq3", ".sqlite", ".smx", ".bsp"):
-                raise ValueError(f"Private or unexpected source export entry: {path}")
             files.append(path)
+    for path in files:
+        parts = path.relative_to(ROOT).parts
+        if (path.is_symlink() or path.name.casefold() in PRIVATE_NAMES
+                or path.suffix.casefold() in PRIVATE_SUFFIXES or path.name.startswith(".env")
+                or {".dserv", ".git", "crashlogs", "logs"}.intersection(parts)):
+            raise ValueError(f"Private or unexpected source export entry: {path.relative_to(ROOT)}")
     return sorted(files)
 
 

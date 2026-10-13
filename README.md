@@ -1,55 +1,53 @@
-english · [русский](README.ru.md)
+# mgebot duel companion 0.3.5
 
-# mgebot duel
+[Русский](README.ru.md) · [Changes](CHANGELOG.md) · [Discord: installation, updates and support](https://discord.gg/GGMz952jBA)
 
-local TF2 training by avxgroup. install it, pick a bot, play.
+A Windows app for TF2 practice with bots: 1v1 duels, local 2v2, bot settings and saved training presets. Includes plugin **5.2.4**, the Triumph map, movement models and English/Russian interfaces.
 
-## get started
+## Start playing
 
-1. unpack the whole release. open `mgebot-duel.exe` on windows or `./mgebot-duel` on linux.
-2. hit **install**. the map and plugin are included; SourceMod and MetaMod download automatically.
-3. pick an arena and hit **start**.
-4. tune the bot in **bots**, then hit **apply**. presets can be saved and shared.
+1. Install TF2 through Steam and close the game before installing or updating components.
+2. Extract the **entire** `mgebot_duel_companion_0.3.5_Windows_x64.zip` and run `mgebot-duel.exe` inside it. Keep the adjacent folders with the executable.
+3. Select your TF2 folder if it is not detected, then choose **Install**. The app downloads the pinned MetaMod and SourceMod dependencies on the first installation.
+4. Choose **1v1** or **2v2**, an arena and bot settings, then start.
 
-already playing a local game with `-insecure`? the app connects to that game.
-for normal secured servers, restart TF2 without `-insecure`.
+When upgrading the app, extract it to a new folder and update the game components with TF2 closed. Your saved presets, player databases and arena edits are preserved. Python does not need to be installed for the portable app.
 
-## what's here
+Local SourceMod uses `-insecure`. Exit TF2 and launch it normally through Steam before joining VAC-secured servers.
 
-- bot class, difficulty, accuracy, weapons and movement settings.
-- **auto** or a clear percentage slider for accuracy. actual hits still depend on dodging and projectile travel.
-- live score, hp, damage, the bot's current plan and learning updates.
-- session history, win rate and damage per minute.
-- shared learning for the bots on your computer. nothing gets uploaded.
+## 2v2
 
-linux build: native TF2, x86_64, glibc 2.28+. for Proton, use the windows package.
+The app hosts the game on your computer through Steam Networking. **Friends Only** is the default; Unlisted and Listed are also available before launch. Invite your friend through Steam. They need the same Triumph map; after connecting, they use `!add`, choose 2v2 and select your arena. Full arenas have a queue.
 
-## your files
+You can also select **Add an AI teammate** to play with a bot against two bots. Scout, Soldier and Demoman are allowed, with no duplicate class within a team. Bot classes are random. A team scores only after eliminating both opponents; everyone respawns together for the next round. First to **20 round wins**. Keep TF2 open while hosting.
 
-presets: `%LOCALAPPDATA%/mgebot-duel` on windows, `~/.local/share/mgebot-duel` on linux (`XDG_DATA_HOME` also works).
+## Training
 
-history and learning: `tf/addons/sourcemod/data/sqlite/`.
-arena edits: `tf/addons/sourcemod/configs/botduel_editor/`.
-updates keep these files. don't share `connection.json` or `mgebot_companion.cfg`: they contain local connection details.
+Tactics, shotgun air deny, switchgun and Gunboats are available directly in the bot setup. Extra settings cover reaction delay, movement, spawn protection and other training rules. Classic Ammomod has starting 300 HP and finite ammunition. Original MGE respawn audio has its own switch. Save presets and use **Apply** to change a running session.
 
-## crash logs
+The app has no operator sign-in, screenshot submission or feedback journal. Alt+Shift+A is not registered. Crash diagnostics remain local: **App settings → TF2 crash logs** opens the folder; the app does not automatically upload reports or dumps. Presets and game connection data stay on your computer.
 
-settings → **TF2 crash logs**. files are in the app's data folder, under `crashlogs/`.
-the recorder keeps up to 10 reports: process exit codes, long stalls, recent console/SourceMod logs and matching dumps if TF2 created them.
-it keeps watching until TF2 exits, even if you close the app. nothing is uploaded.
+## Release notes
 
-## source and builds
+- Windows x64 app only. Linux users use the separate **Linux Dedicated** plugin archive with their own TF2 server.
+- `!hop` needs a compatible optional RIPExt extension. The Windows local-practice bundle does not install it; the Linux dedicated archive includes it.
+- The plugin includes the Windows address fix and the 2v2 arena/round fixes. Full gameplay and Steam friend joining on the previously affected Windows PC still need confirmation. The separately reported Windows `TF2_RemoveCondition` issue remains unresolved.
 
-Python 3.12+. install `requirements.txt`, then run `python run.py`.
-a source checkout needs the matching plugin package via `--payload path/to/package.zip`; ready releases already include it.
+## Source and build
+
+The source archive contains the companion app and its build scripts. Bot SourcePawn source and personal data are not included. See [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY.md).
+
+With Python 3.13, install `requirements.txt`, then run:
 
 ```sh
-python scripts/build.py --platform windows --out build/windows --cache build/cache --payload mgebot_duel_5.1.2_Windows_x64.zip
-python scripts/build.py --platform linux --out build/linux --cache build/cache --payload mgebot_duel_5.1.2_Linux_x64.zip
-python scripts/package.py --out dist --build build/windows --build build/linux
+python run.py --payload /path/to/mgebot_duel_5.2.4_Windows_x64.zip
 ```
 
-windows builds need MinGW-w64; linux builds need `dpkg-deb`. Python and Qt are bundled in the finished app.
-the bot's private SourcePawn code is not included.
+To create a Windows portable bundle, install MinGW-w64 with `gcc` and `windres` and run:
 
-[changes](CHANGELOG.md) · [license](LICENSE) · [credits](THIRD_PARTY.md)
+```sh
+python scripts/build.py --platform windows --out build/windows --cache build/cache --payload /path/to/mgebot_duel_5.2.4_Windows_x64.zip
+python scripts/package.py --out dist --build build/windows
+```
+
+The build verifies pinned downloads from `build-lock.json`; the package records hashes and requires the source to match the built app. `SHA256SUMS.txt` accompanies release assets.
