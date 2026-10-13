@@ -31,7 +31,7 @@ The app has no operator sign-in, screenshot submission or feedback journal. Alt+
 
 - Windows x64 app only. Linux users use the separate **Linux Dedicated** plugin archive with their own TF2 server.
 - `!hop` needs a compatible optional RIPExt extension. The Windows local-practice bundle does not install it; the Linux dedicated archive includes it.
-- The plugin includes the Windows address fix and the 2v2 arena/round fixes. Full gameplay and Steam friend joining on the previously affected Windows PC still need confirmation. The separately reported Windows `TF2_RemoveCondition` issue remains unresolved.
+- The plugin includes the Windows address fix and the 2v2 arena/round fixes. Full gameplay and Steam friend joining on the previously affected Windows PC still need confirmation. 
 
 ## Source and build
 
