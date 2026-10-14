@@ -4,6 +4,8 @@
 
 A Windows app for TF2 practice with bots: 1v1 duels, local 2v2, bot settings and saved training presets. Includes plugin **5.2.4**, the Triumph map, movement models and English/Russian interfaces.
 
+sourcemod version needed - 1.13.0.7441
+
 ## Start playing
 
 1. Install TF2 through Steam and close the game before installing or updating components.
