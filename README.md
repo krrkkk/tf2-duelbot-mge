@@ -2,19 +2,6 @@
 
 [Русский](README.ru.md) · [Changes](CHANGELOG.md) · [Discord: installation, updates and support](https://discord.gg/GGMz952jBA)
 
-A Windows app for TF2 practice with bots: 1v1 duels, local 2v2, bot settings and saved training presets. Includes plugin **5.3.1**, the Triumph and League v5 maps, movement models and English/Russian interfaces.
-
-
-## In this version
-
-- Removed bot chat and Beggar’s Bazooka; 75 supported weapon choices.
-- Legacy presets retain other settings; retired values migrate to off/default.
-- Plugin settings have seven clear entries, consistent Back paths and class-specific controls.
-- Includes Triumph/League v5, backstab-only, names and equipment copying.
-
-Prepared candidate: no services started or restarted, native TF2 acceptance pending.
-App checks do not replace testing in TF2.
-
 sourcemod version needed - 1.13.0.7441
 
 ## Start playing
