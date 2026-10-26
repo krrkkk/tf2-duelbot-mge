@@ -15,6 +15,8 @@ A Windows app for TF2 practice with bots: 1v1 duels, local 2v2, bot settings and
 Prepared candidate: no services started or restarted, native TF2 acceptance pending.
 App checks do not replace testing in TF2.
 
+sourcemod version needed - 1.13.0.7441
+
 ## Start playing
 
 1. Install TF2 through Steam and close the game before installing or updating components.
@@ -42,7 +44,7 @@ The app has no operator sign-in, screenshot submission or feedback journal. Alt+
 
 - Windows x64 app only. Linux users use the separate **Linux Dedicated** plugin archive with their own TF2 server.
 - `!hop` needs a compatible optional RIPExt extension. The Windows local-practice bundle does not install it; the Linux dedicated archive includes it.
-- The plugin includes the Windows address fix and the 2v2 arena/round fixes. Full gameplay and Steam friend joining on the previously affected Windows PC still need confirmation. The separately reported Windows `TF2_RemoveCondition` issue remains unresolved.
+- The plugin includes the Windows address fix and the 2v2 arena/round fixes. Full gameplay and Steam friend joining on the previously affected Windows PC still need confirmation. 
 
 ## Source and build
 
