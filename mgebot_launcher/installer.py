@@ -274,6 +274,7 @@ class Installer:
 
 
                 preserve_existing.add("tf/addons/sourcemod/configs/botduel_difficulty.cfg")
+                preserve_existing.update(name for name in own if name.startswith("tf/addons/sourcemod/configs/botduel_maps/"))
                 preserve_existing.update(name for name in own if name.startswith("bin/"))
                 combined.update(own)
                 spawn_name = "tf/addons/sourcemod/configs/mgemod_spawns.cfg"

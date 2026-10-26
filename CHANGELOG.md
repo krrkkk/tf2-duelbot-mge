@@ -1,6 +1,24 @@
+## 0.3.7 — prepared
+
+- Shorter player-facing text and errors; technical details stay in logs.
+
+- Removed chat and Beggar’s from the UI and supported loadouts.
+- Legacy presets retain other preferences and migrate retired values to off/default.
+- Plugin 5.3.1 reorganizes settings and Back navigation.
+- No services started/restarted; native TF2 acceptance remains pending.
+
+## 0.3.6
+
+- Plugin 5.3.0: slot loadouts, names, chat, backstab-only and equipment copying.
+- Triumph/League v5 selection, instant-respawn option, no 3s wait between 2v2 rounds.
+- New fields persist in presets; malformed values are rejected before partial apply.
+- Validation covers new functions and explicitly reported older failures only.
+
 ## 0.3.5
 
 - Public Windows release with plugin 5.2.4.
+- Removed operator sign-in, screenshot feedback, feedback history and Alt+Shift+A from the application.
+- Public source and portable builds exclude operator tooling and local runtime data.
 - Refreshed English and Russian installation instructions. Local crash reports remain available in App settings.
 
 ## 0.3.4

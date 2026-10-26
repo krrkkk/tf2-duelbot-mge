@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import sys
+import logging
 from dataclasses import asdict
 from pathlib import Path
 
@@ -11,7 +12,7 @@ if sys.platform == "win32":
 
 from PyQt6.QtCore import Qt, QTimer, QSize, QPropertyAnimation, QEasingCurve, QUrl
 from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtGui import QColor, QFont, QFontDatabase, QIcon, QKeySequence, QShortcut, QDesktopServices
+from PyQt6.QtGui import QColor, QFont, QFontDatabase, QIcon, QKeySequence, QShortcut, QDesktopServices, QValidator
 from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QComboBox,
     QDialog, QFileDialog, QFrame, QGraphicsOpacityEffect, QGridLayout, QHBoxLayout,
     QHeaderView, QInputDialog, QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
@@ -21,6 +22,7 @@ from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QCom
 from . import __version__
 from .i18n import CLASSES_RU, text
 from .presets import BotSettings, CLASS_NAMES, Preset, PresetStore, SessionSettings, PracticeSettings
+from .loadouts import LOADOUTS
 from .storage import read_json, write_json
 from .theme import STYLESHEET
 from .widgets import ActionButton, ClassButton, NumericControl, Toggle, WindowBar, WelcomeReveal, icon, ASSETS
@@ -30,6 +32,15 @@ def duration(seconds):
     hours, rest = divmod(max(0, round(seconds)), 3600)
     minutes, second = divmod(rest, 60)
     return f"{hours}:{minutes:02}:{second:02}" if hours else f"{minutes}:{second:02}"
+
+
+class BotNameValidator(QValidator):
+    def validate(self, value, position):
+        try:
+            PracticeSettings.parse({"bot_name": value})
+        except (ValueError, UnicodeError):
+            return QValidator.State.Invalid, value, position
+        return QValidator.State.Acceptable, value, position
 
 
 class MainWindow(QMainWindow):
@@ -43,6 +54,7 @@ class MainWindow(QMainWindow):
     teammate_requested = pyqtSignal()
     stop_requested = pyqtSignal()
     history_requested = pyqtSignal()
+    map_changed = pyqtSignal(str)
 
     def __init__(self, data: Path, payload: Path | None = None, demo=False):
         super().__init__()
@@ -55,6 +67,8 @@ class MainWindow(QMainWindow):
         self.visibility = self.preferences.get("visibility", "friends")
         if self.visibility not in ("friends", "unlisted", "listed"): self.visibility = "friends"
         self.host_class = self.preferences.get("host_class", 3)
+        self.training_map = self.preferences.get("training_map", "mge_triumph_beta7_rc1")
+        if self.training_map not in ("mge_triumph_beta7_rc1", "mge_league_v5"): self.training_map = "mge_triumph_beta7_rc1"
         if self.host_class not in (1, 3, 4): self.host_class = 3
         self._base_settings = BotSettings()
         self.demo = demo; self.payload = str(payload) if payload else ""
@@ -174,6 +188,10 @@ class MainWindow(QMainWindow):
         lower = QHBoxLayout(); lower.setSpacing(18)
         setup, form = self.panel(); form.addWidget(self.label(self.t("your_setup"), "Section"))
         self.preset_box = QComboBox(); self.preset_box.setAccessibleName(self.t("preset")); self.preset_box.currentIndexChanged.connect(self._choose_preset); form.addWidget(self.preset_box)
+        form.addWidget(self.label(self.t("training_map"), "FieldLabel"))
+        self.map_box = QComboBox(); self.map_box.setAccessibleName(self.t("training_map"))
+        self.map_box.addItem("MGE Triumph", "mge_triumph_beta7_rc1"); self.map_box.addItem("MGE League v5", "mge_league_v5"); self.map_box.setItemData(1, "Snakewater · Node · Silo · 20 arenas", Qt.ItemDataRole.ToolTipRole)
+        self.map_box.setCurrentIndex(max(0, self.map_box.findData(self.training_map))); self.map_box.currentIndexChanged.connect(self._change_map); form.addWidget(self.map_box)
         form.addWidget(self.label(self.t("arena"), "Muted"))
         self.arena_box = QComboBox(); self.arena_box.setAccessibleName(self.t("arena")); form.addWidget(self.arena_box)
         self.setup_summary = self.label("", None, True); form.addWidget(self.setup_summary)
@@ -233,10 +251,11 @@ class MainWindow(QMainWindow):
         self.settings_tabs = QTabWidget(); self.controls = {}; self.session_controls = {}; self.practice_controls = {}
 
         groups = [
-            ("combat", ["skill_step", "accuracy", "weapon_mode", "gunboats", "switchgun", "headshots_only", "quickswitch", "shotgun_deny", "shotgun_stall", "wait_soldier", "respawn_sound"]),
-            ("rules", ["player_hp", "bot_hp", "ammo_policy", "frag_limit", "player_ammo", "bot_ammo", "infinite_player", "infinite_bot", "spawn_grace", "hud", "exercise"]),
+            ("combat", ["skill_step", "accuracy", "weapon_mode", "primary_item", "secondary_item", "melee_item", "gunboats", "switchgun", "headshots_only", "backstab_only", "quickswitch", "shotgun_deny", "shotgun_stall", "wait_soldier", "alternate_soldier", "respawn_sound"]),
+            ("rules", ["player_hp", "bot_hp", "ammo_policy", "frag_limit", "respawn_delay", "player_ammo", "bot_ammo", "infinite_player", "infinite_bot", "spawn_grace", "hud", "exercise"]),
             ("reaction", ["aim_delay", "random_reaction", "preset_1_delay", "preset_1_jitter", "preset_1_weight", "preset_2_delay", "preset_2_jitter", "preset_2_weight", "preset_3_delay", "preset_3_jitter", "preset_3_weight"]),
             ("movement", ["speed", "strafe_rate", "jump_rate", "crouch_rate", "move_style", "ad_style", "cover_play", "ground_priors", "air_priors", "adaptive_learning"]),
+            ("personal_bot", ["bot_name", "mirror_gear"]),
         ]
         session_fields = asdict(SessionSettings()); practice_fields = asdict(PracticeSettings())
         for group, fields in groups:
@@ -274,6 +293,8 @@ class MainWindow(QMainWindow):
             "regeneration": [(0, self.t("off")), (10, "10 HP/s"), (25, "25 HP/s"), (50, "50 HP/s")],
             "exercise": [(-1, self.t("map_rules")), (0, "MGE"), (1, "Ammomod"), (2, "Endif"), (3, "Midair")],
         }
+        for item_name in ("primary_item", "secondary_item", "melee_item"):
+            choices[item_name] = [(-1, self.t("default_loadout"))]
         defaults = asdict(PracticeSettings() if practice else SessionSettings() if environment else BotSettings()); value = defaults[name]
         container = QWidget(); column = QVBoxLayout(container); column.setContentsMargins(0, 0, 0, 0); column.setSpacing(10)
         if name in choices:
@@ -281,10 +302,18 @@ class MainWindow(QMainWindow):
             control = QComboBox(); control.setAccessibleName(self.t(name)); label.setBuddy(control)
             for key, caption in choices[name]: control.addItem(caption, key)
             control.currentIndexChanged.connect(self._edited); column.addWidget(control)
+        elif type(value) is str:
+            label = self.label(self.t(name), "FieldLabel"); column.addWidget(label)
+            control = QLineEdit(); control.setMaxLength(31); control.setAccessibleName(self.t(name)); label.setBuddy(control)
+            control.setValidator(BotNameValidator(control))
+            control.setPlaceholderText(self.t("random_name")); control.textEdited.connect(self._edited); column.addWidget(control)
+            column.addStretch()
         elif type(value) is bool:
             control = Toggle(self.t(name)); control.setAccessibleName(self.t(name)); control.toggled.connect(self._edited); column.addWidget(control)
             note = {"combo": "combo_note", "switchgun": "switchgun_hint", "adaptive_learning": "adaptive_note", "ground_priors": "ground_note", "air_priors": "air_note", "cover_play": "cover_note", "shotgun_deny": "shotgun_deny_note", "quickswitch": "quickswitch_note", "shotgun_stall": "shotgun_stall_note", "spawn_grace": "spawn_grace_note", "wait_soldier": "wait_soldier_note", "infinite_player": "infinite_health_note", "infinite_bot": "infinite_health_note", "respawn_sound": "respawn_sound_note"}.get(name)
-            if note: column.addWidget(self.label(self.t(note), "Muted", True))
+            if note and self.t(note): column.addWidget(self.label(self.t(note), "Muted", True))
+            if name in ("backstab_only", "alternate_soldier", "mirror_gear") and self.t(name + "_note"):
+                column.addWidget(self.label(self.t(name + "_note"), "Muted", True))
             column.addStretch()
         else:
             limits = {"skill_step": (1, 10, 1, ""), "accuracy": (0, 100, 1, "%"),
@@ -294,9 +323,10 @@ class MainWindow(QMainWindow):
                       "frag_limit": (1, 100, 1, ""), "afk_seconds": (15, 3600, 15, "s"),
                       "gravity": (200, 1200, 25, ""), "air_acceleration": (0.0, 100.0, .5, "")}
             if practice: limits[name] = (0.0, 1.0, 0.1 if name.endswith("weight") else 0.2, "" if name.endswith("weight") else "s")
-            auto = -1 if name == "accuracy" else 0 if name in ("bot_hp", "player_hp", "frag_limit", "afk_seconds") else None
+            auto = -1 if name in ("accuracy", "respawn_delay") else 0 if name in ("bot_hp", "player_hp", "frag_limit", "afk_seconds") else None
             label = self.t("automatic_short") if name == "accuracy" else self.t("default_short") if name.endswith("_hp") else self.t("unlimited") if name == "frag_limit" else self.t("off")
             hint = self.t("accuracy_auto_note") if name == "accuracy" else self.t("default_hp") if name.endswith("_hp") else self.t("unlimited") if name == "frag_limit" else self.t("afk_off_note")
+            if name == "respawn_delay": label = self.t("map_rules"); hint = self.t("respawn_delay_note")
             control = NumericControl(self.t(name), *limits[name], automatic=auto, automatic_label=label, automatic_hint=hint)
             control.setAccessibleName(self.t(name)); control.valueChanged.connect(self._edited)
             if name == "accuracy": control.setToolTip(self.t("accuracy_hint"))
@@ -308,6 +338,13 @@ class MainWindow(QMainWindow):
     def _normalize_controls(self):
         old = self._loading; self._loading = True; cls = self.class_group.checkedId()
         duo = self.mode == "duo"
+        for slot, name in enumerate(("primary_item", "secondary_item", "melee_item")):
+            control = self.practice_controls[name]
+            if control.property("loadout_class") != cls:
+                selected = control.currentData(); control.clear(); control.addItem(self.t("default_loadout"), -1)
+                for item, item_class, item_slot, caption in LOADOUTS:
+                    if item_class == cls and item_slot == slot: control.addItem(caption, item)
+                control.setProperty("loadout_class", cls); index = control.findData(selected); control.setCurrentIndex(max(0, index))
         for name, visible in (("gunboats", cls == 3), ("headshots_only", cls == 2)):
             self.controls[name].property("container").setVisible(visible)
             if not visible: self.controls[name].setChecked(False)
@@ -328,6 +365,10 @@ class MainWindow(QMainWindow):
             if name.startswith("preset_"): control.setEnabled(not duo and self.practice_controls["random_reaction"].isChecked())
             if name in ("quickswitch", "shotgun_stall", "wait_soldier"):
                 control.property("container").setVisible(not duo and (cls == 3 or (name != "wait_soldier" and cls == 1)))
+            if name in ("primary_item", "secondary_item", "melee_item"):
+                control.setEnabled(not duo and not self.practice_controls["mirror_gear"].isChecked() and (name != "secondary_item" or not self.controls["gunboats"].isChecked()))
+            if name == "backstab_only": control.property("container").setVisible(not duo and cls == 8)
+            if name == "alternate_soldier": control.property("container").setVisible(not duo and cls == 3)
         for control in self.session_controls.values(): control.setEnabled(not duo)
         for index in range(1, self.settings_tabs.count()): self.settings_tabs.setTabEnabled(index, not duo)
         if duo: self.settings_tabs.setCurrentIndex(0)
@@ -410,13 +451,16 @@ class MainWindow(QMainWindow):
         self._loading = previous
 
     def practice_settings(self):
-        return PracticeSettings.parse({name: control.currentData() if isinstance(control, QComboBox) else control.isChecked() if isinstance(control, Toggle) else control.value() for name, control in self.practice_controls.items()})
+        return PracticeSettings.parse({name: control.currentData() if isinstance(control, QComboBox) else control.text() if isinstance(control, QLineEdit) else control.isChecked() if isinstance(control, Toggle) else control.value() for name, control in self.practice_controls.items()})
 
     def set_practice_settings(self, settings):
+        settings = PracticeSettings.parse(asdict(settings))
         previous = self._loading; self._loading = True
         for name, value in asdict(settings).items():
+            if name not in self.practice_controls: continue
             control = self.practice_controls[name]
             if isinstance(control, QComboBox): control.setCurrentIndex(control.findData(value))
+            elif isinstance(control, QLineEdit): control.setText(value)
             elif isinstance(control, Toggle): control.setChecked(value)
             else: control.setValue(value)
         self._normalize_controls(); self._loading = previous
@@ -437,7 +481,7 @@ class MainWindow(QMainWindow):
         key = "state_" + stage
         caption = self.t(key)
         self.connection_status.setText(self.t("demo_status") if self.demo else caption)
-        self.stage_label.setText(caption); self.stage_label.setToolTip(detail)
+        self.stage_label.setText(caption); self.stage_label.setToolTip("")
         self.hero_title.setText(self.t("hero_duo" if self.mode == "duo" else "hero_ready" if self.install_ready else "hero_install"))
         self.hero_description.setText(self.t("hero_duo_note" if self.mode == "duo" else "hero_ready_note" if self.install_ready else "hero_install_note"))
         self.folder_label.setText(self.t("game_found") if self.game_directory else self.t("find_game"))
@@ -452,6 +496,7 @@ class MainWindow(QMainWindow):
 
         available = not self.busy and not self.action_busy
         active = self.online and bool(self.last_snapshot.get("active") or self.last_snapshot.get("team", {}).get("hosting"))
+        self.map_box.setEnabled(available and not active and not self.launch_pending)
         label = "connecting" if self.launch_pending else ("host_duo" if self.mode == "duo" else "start_main") if self.install_ready else "install_main"
         self.main_button.setText(self.t(label)); self.main_button.symbol = "play" if self.install_ready else "download"
         self.main_button.setVisible(not active)
@@ -474,6 +519,11 @@ class MainWindow(QMainWindow):
     def set_action_busy(self, busy):
         self.action_busy = busy; self._update_actions()
 
+    def _change_map(self, index):
+        selected = self.map_box.currentData()
+        if selected not in ("mge_triumph_beta7_rc1", "mge_league_v5"): return
+        self.training_map = selected; self.set_arenas([]); self._save_preferences(); self.map_changed.emit(selected)
+
     def set_launch_pending(self, pending):
         self.launch_pending = pending; self._update_actions()
 
@@ -482,8 +532,7 @@ class MainWindow(QMainWindow):
         if not busy and self._closing: self.close()
 
     def install_progress(self, phase, current, total):
-        name = {"sourcemod": "SourceMod", "metamod-source": "MetaMod:Source", "Install": self.t("write_files")}.get(phase, phase)
-        self.stage_label.setText(self.t("installation_busy") + " " + name)
+        self.stage_label.setText(self.t("write_files") if phase == "Install" else self.t("download_components"))
         self.progress.setRange(0, 100 if total else 0)
         if total: self.progress.setValue(current * 100 // total)
 
@@ -611,7 +660,7 @@ class MainWindow(QMainWindow):
 
     def _save_preferences(self):
         self.preferences.update(language=self.language, motion=self.motion, tf_directory=self.game_directory,
-                                preset=self.current_preset, arena=self.arena_box.currentData(), mode=self.mode, visibility=self.visibility, host_class=self.host_class)
+                                preset=self.current_preset, arena=self.arena_box.currentData(), mode=self.mode, visibility=self.visibility, host_class=self.host_class, training_map=self.training_map)
         write_json(self.data / "ui.json", self.preferences)
 
     def _preferences(self):
@@ -646,6 +695,10 @@ class MainWindow(QMainWindow):
         return selected
 
     def notify(self, message, error=False):
+        if error:
+            logging.warning("Player-facing error: %s", message)
+            from .i18n import error_text
+            message = error_text(message, self.language)
         self.message.setObjectName("Error" if error else "Message"); self.message.setText(message)
         self.message.style().unpolish(self.message); self.message.style().polish(self.message); self.message.show()
         if not error: QTimer.singleShot(7000, self.message.hide)

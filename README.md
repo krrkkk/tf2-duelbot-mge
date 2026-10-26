@@ -1,23 +1,34 @@
-# mgebot duel companion 0.3.5
+# mgebot duel companion 0.3.7
 
 [Русский](README.ru.md) · [Changes](CHANGELOG.md) · [Discord: installation, updates and support](https://discord.gg/GGMz952jBA)
 
-A Windows app for TF2 practice with bots: 1v1 duels, local 2v2, bot settings and saved training presets. Includes plugin **5.2.4**, the Triumph map, movement models and English/Russian interfaces.
+A Windows app for TF2 practice with bots: 1v1 duels, local 2v2, bot settings and saved training presets. Includes plugin **5.3.1**, the Triumph and League v5 maps, movement models and English/Russian interfaces.
+
+
+## In this version
+
+- Removed bot chat and Beggar’s Bazooka; 75 supported weapon choices.
+- Legacy presets retain other settings; retired values migrate to off/default.
+- Plugin settings have seven clear entries, consistent Back paths and class-specific controls.
+- Includes Triumph/League v5, backstab-only, names and equipment copying.
+
+Prepared candidate: no services started or restarted, native TF2 acceptance pending.
+App checks do not replace testing in TF2.
 
 ## Start playing
 
 1. Install TF2 through Steam and close the game before installing or updating components.
-2. Extract the **entire** `mgebot_duel_companion_0.3.5_Windows_x64.zip` and run `mgebot-duel.exe` inside it. Keep the adjacent folders with the executable.
+2. Extract the **entire** `mgebot_duel_companion_0.3.7_Windows_x64.zip` and run `mgebot-duel.exe` inside it. Keep the adjacent folders with the executable.
 3. Select your TF2 folder if it is not detected, then choose **Install**. The app downloads the pinned MetaMod and SourceMod dependencies on the first installation.
 4. Choose **1v1** or **2v2**, an arena and bot settings, then start.
 
 When upgrading the app, extract it to a new folder and update the game components with TF2 closed. Your saved presets, player databases and arena edits are preserved. Python does not need to be installed for the portable app.
 
-Local SourceMod uses `-insecure`. Exit TF2 and launch it normally through Steam before joining VAC-secured servers.
+Launch TF2 through this app for practice. Exit the game and restart it through Steam before joining regular servers.
 
 ## 2v2
 
-The app hosts the game on your computer through Steam Networking. **Friends Only** is the default; Unlisted and Listed are also available before launch. Invite your friend through Steam. They need the same Triumph map; after connecting, they use `!add`, choose 2v2 and select your arena. Full arenas have a queue.
+The app hosts the game on your computer through Steam Networking. **Friends Only** is the default; Unlisted and Listed are also available before launch. Invite your friend through Steam. They need the same selected map; after connecting, they use `!add`, choose 2v2 and select your arena. Full arenas have a queue.
 
 You can also select **Add an AI teammate** to play with a bot against two bots. Scout, Soldier and Demoman are allowed, with no duplicate class within a team. Bot classes are random. A team scores only after eliminating both opponents; everyone respawns together for the next round. First to **20 round wins**. Keep TF2 open while hosting.
 
@@ -40,13 +51,13 @@ The source archive contains the companion app and its build scripts. Bot SourceP
 With Python 3.13, install `requirements.txt`, then run:
 
 ```sh
-python run.py --payload /path/to/mgebot_duel_5.2.4_Windows_x64.zip
+python run.py --payload /path/to/mgebot_duel_5.3.1_Windows_x64.zip
 ```
 
 To create a Windows portable bundle, install MinGW-w64 with `gcc` and `windres` and run:
 
 ```sh
-python scripts/build.py --platform windows --out build/windows --cache build/cache --payload /path/to/mgebot_duel_5.2.4_Windows_x64.zip
+python scripts/build.py --platform windows --out build/windows --cache build/cache --payload /path/to/mgebot_duel_5.3.1_Windows_x64.zip
 python scripts/package.py --out dist --build build/windows
 ```
 

@@ -151,6 +151,15 @@ class PracticeSettings:
     preset_3_weight: float = 0.1
     respawn_sound: bool = True
     shotgun_deny: bool = True
+    bot_name: str = ""
+    bot_chat: int = 0
+    backstab_only: bool = False
+    alternate_soldier: bool = True
+    mirror_gear: bool = False
+    primary_item: int = -1
+    secondary_item: int = -1
+    melee_item: int = -1
+    respawn_delay: float = -1.0
 
     @classmethod
     def parse(cls, data: Any) -> "PracticeSettings":
@@ -161,7 +170,8 @@ class PracticeSettings:
             kind = type(defaults[name])
             if kind is float:
                 step = 0.1 if name.endswith("weight") else 0.2
-                if type(value) not in (int, float) or not math.isfinite(value) or not 0 <= value <= 1 or abs(value / step - round(value / step)) > 0.00001:
+                map_default = name == "respawn_delay" and value == -1
+                if type(value) not in (int, float) or not math.isfinite(value) or (not map_default and (not 0 <= value <= 1 or abs(value / step - round(value / step)) > 0.00001)):
                     raise ValueError(f"Invalid practice value: {name}")
                 value = round(float(value), 1)
             elif type(value) is not kind:
@@ -169,6 +179,20 @@ class PracticeSettings:
             defaults[name] = value
         if defaults["ammo_policy"] not in (-1, 0, 1):
             raise ValueError("Invalid ammo policy")
+        if defaults["bot_chat"] not in (0, 1, 2):
+            raise ValueError("Invalid bot chat mode")
+        defaults["bot_chat"] = 0
+        for name in ("primary_item", "secondary_item", "melee_item"):
+            if not -1 <= defaults[name] <= 12000:
+                raise ValueError("Invalid loadout item")
+            if defaults[name] == 730:
+                defaults[name] = -1
+        name = defaults["bot_name"].strip()
+        if len(name.encode("utf-8")) >= 32:
+            raise ValueError("Bot name is too long")
+        if any(ord(c) < 32 or ord(c) == 127 or c in '\\"|;%' for c in name):
+            raise ValueError("Remove special characters from the bot name")
+        defaults["bot_name"] = name
         return cls(**defaults)
 
     def to_keyvalues(self, player_class: int = 3) -> str:

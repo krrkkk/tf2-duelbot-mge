@@ -12,8 +12,8 @@ COPY = {
     "package": ("Пакет mgebot duel", "mgebot duel package"),
     "bundled": ("Пакет из сборки приложения", "Package bundled with this app"),
     "package_hint": ("Для сборки из исходников выбери архив плагина для своей системы.", "For a source checkout, choose the plugin archive for your platform."),
-    "dependencies": ("Компоненты", "Components"), "official": ("Загрузка из официальных релизов с проверкой SHA-256", "Downloaded from official releases with SHA-256 verification"),
-    "preserve": ("Твои базы, администраторы и разметка арен сохраняются. Существующие файлы перед заменой копируются для отката.", "Your databases, admins and arena edits are preserved. Existing files are backed up before replacement."),
+    "dependencies": ("Компоненты", "Components"), "official": ('С официальных сайтов', 'From official sites'),
+    "preserve": ('Пресеты, статистика и свои арены сохранятся.', 'Presets, stats and custom arenas are kept.'),
     "install_action": ("Установить / обновить", "Install / update"), "cancel": ("Отменить", "Cancel"),
     "installed": ("Установлено. Можно запускать тренировку.", "Installed. You can now start training."),
     "installation_busy": ("Установка…", "Installing…"), "preset": ("Пресет", "Preset"),
@@ -34,8 +34,8 @@ COPY = {
     "combat": ("Бой", "Combat"), "movement": ("Движение", "Movement"), "rules": ("Правила", "Rules"),
     "bot_class": ("Класс бота", "Bot class"), "skill_step": ("Сложность", "Difficulty"),
     "combo": ("Комбо-оружие · уровень 10", "Combo weapons · level 10"),
-    "accuracy": ("Прицельные атаки", "Aimed attacks"), "automatic": ("По сложности", "By difficulty"),
-    "accuracy_hint": ("Целевая доля прицельных атак. Реальные попадания также зависят от уклонений, разброса и полёта снаряда.", "Target share of aimed attacks. Actual hits also depend on dodging, spread and projectile flight."),
+    "accuracy": ('Точность', 'Accuracy'), "automatic": ("По сложности", "By difficulty"),
+    "accuracy_hint": ('Как часто бот целится в противника.', 'How often the bot aims at the opponent.'),
     "weapon_mode": ("Оружие", "Weapon"), "auto_weapon": ("Автоматический выбор", "Automatic selection"),
     "primary": ("Основное", "Primary"), "secondary": ("Вторичное", "Secondary"), "melee": ("Ближний бой", "Melee"),
     "switchgun": ("свитчган", "switchgun"),
@@ -56,11 +56,11 @@ COPY = {
     "default_hp": ("По правилам арены", "Arena default"), "fall_protection": ("Без урона от падения", "No fall damage"),
     "exercise": ("Режим", "Mode"), "map_rules": ("Правила арены", "Arena rules"),
     "frag_limit": ("До скольких фрагов", "Frag limit"), "unlimited": ("Без лимита", "Unlimited"),
-    "hud": ("Показывать MGE HUD", "Show MGE HUD"), "hit_sound": ("Звук попадания", "Hit sound"),
+    "hud": ('Показывать счёт', 'Show score'), "hit_sound": ("Звук попадания", "Hit sound"),
     "session": ("Текущая сессия", "Current session"), "no_session": ("Начни дуэль, чтобы увидеть счёт, HP и урон в реальном времени.", "Start a duel to see live score, HP and damage."),
     "player": ("Игрок", "Player"), "bot": ("Бот", "Bot"), "damage_out": ("Нанесено", "Dealt"),
     "damage_in": ("Получено", "Taken"), "active_time": ("В бою", "Active time"), "airshots": ("Аиршоты", "Airshots"),
-    "local_launch_note": ("Локальная тренировка запускает TF2 с -insecure. Для обычных серверов потом перезапусти игру через Steam.", "Local training launches TF2 with -insecure. Restart through Steam afterwards to play on ordinary servers."),
+    "local_launch_note": ('Для тренировки запусти TF2 через приложение. Для обычных серверов — через Steam.', 'Launch TF2 through this app for practice, or through Steam for regular servers.'),
     "starting": ("Запускаю TF2. Подключение появится после загрузки карты.", "Starting TF2. The connection appears after the map loads."),
     "history_empty": ("Здесь появятся завершённые и прерванные тренировки. История хранится в твоей папке TF2.", "Completed and interrupted sessions will appear here. History stays in your TF2 folder."),
     "refresh": ("Обновить", "Refresh"), "all_players": ("Все игроки", "All players"),
@@ -84,51 +84,51 @@ COPY.update({
     "connecting": ("подключаюсь…", "connecting…"), "dpm_history": ("урон за минуту · по дуэлям", "damage per minute · by duel"),
     "play_page": ("Играть", "Play"), "bots_page": ("Боты", "Bots"), "statistics_page": ("Статистика", "Statistics"),
     "app_settings": ("Приложение", "App settings"), "minimize": ("Свернуть", "Minimize"), "maximize": ("Развернуть", "Maximize"), "close": ("Закрыть", "Close"),
-    "hero_install": ("Твоя следующая дуэль.", "Your next duel."), "hero_ready": ("Твоя следующая дуэль.", "Your next duel."),
-    "hero_install_note": ("Установи карту и бота одним нажатием. Выбери класс и начни локальную тренировку.", "Install the map and bot in one click. pick a class and start a local training session."),
-    "hero_ready_note": ("Выбери арену и настрой соперника. Пресеты и результаты тренировок остаются на твоём компьютере.", "Choose an arena and tune your opponent. your presets and training history stay on your computer."),
+    "hero_install": ('Тренировка MGE', 'MGE practice'), "hero_ready": ('Тренировка MGE', 'MGE practice'),
+    "hero_install_note": ('Установи компоненты и начни тренировку.', 'Install the components and start training.'),
+    "hero_ready_note": ('Выбери арену и начни дуэль.', 'Pick an arena and start a duel.'),
     "checking": ("Проверяю установку…", "Checking your setup…"), "find_game": ("Поиск TF2 в Steam", "Finding TF2 in Steam"), "game_found": ("Team Fortress 2 найдена", "Team Fortress 2 found"),
     "install_main": ("Установить", "Install"), "start_main": ("Начать тренировку", "Start"), "return_game": ("Вернуться в TF2", "Return to TF2"),
-    "your_setup": ("Твоя тренировка", "Your training setup"), "configure_bot": ("Настроить бота", "Configure bot"), "bots_title": ("Настрой соперника", "Tune your opponent"),
+    "your_setup": ("Твоя тренировка", "Your training setup"), "configure_bot": ("Настроить бота", "Configure bot"), "bots_title": ('Настройки бота', 'Bot settings'),
     "preset_actions": ("Пресеты", "Presets"), "rename": ("Переименовать", "Rename"), "delete": ("Удалить", "Delete"), "delete_preset_question": ("Удалить выбранный пресет?", "Delete the selected preset?"),
-    "advanced": ("Поведение", "Behavior"), "accuracy": ("Точность", "Accuracy"), "automatic_short": ("Авто", "Auto"), "default_short": ("По умолчанию", "Default"), "off": ("Выключено", "Off"),
+    "advanced": ("Поведение", "Behavior"), "accuracy": ('Точность', 'Accuracy'), "automatic_short": ("Авто", "Auto"), "default_short": ("По умолчанию", "Default"), "off": ("Выключено", "Off"),
     "accuracy_auto_note": ("Точность задаётся уровнем сложности", "Accuracy follows the selected difficulty"),
-    "accuracy_hint": ("Целевая точность наведения. Уклонения, разброс и полёт снаряда всё ещё влияют на попадания.", "Target aiming accuracy. Dodging, weapon spread and projectile travel still affect actual hits."),
+    "accuracy_hint": ('Как часто бот целится в противника.', 'How often the bot aims at the opponent.'),
     "afk_off_note": ("Арена не освобождается при бездействии", "Inactivity does not release the arena"),
     "combo_note": ("Особое оружие на максимальной сложности", "Special loadouts at the highest difficulty"),
-    "adaptive_learning": ("Общее обучение ботов", "Shared bot learning"), "adaptive_note": ("Активные дуэли улучшают общие оценки тактик.", "Active duels update shared tactical scores."),
-    "ground_priors": ("Движение по демкам", "Movement from demos"), "ground_note": ("Использовать подготовленные наземные приоритеты.", "Use the supplied ground-movement priors."),
-    "air_priors": ("Воздушное движение по демкам", "Air movement from demos"), "air_note": ("Подсказки стрейфа в пределах физики игры.", "Air-strafe guidance within the game's physics."),
-    "cover_play": ("Игра от укрытий", "Cover and prefire"), "cover_note": ("Память о противнике, сплеш и короткие выходы.", "Opponent memory, splash and short corner peeks."),
+    "adaptive_learning": ('Адаптация тактики', 'Adaptive tactics'), "adaptive_note": ('Бот меняет тактику по ходу боя.', 'The bot adjusts its tactics during the fight.'),
+    "ground_priors": ('Движение по демкам', 'Movement from demos'), "ground_note": ('', ''),
+    "air_priors": ('Полёт по демкам', 'Air movement from demos'), "air_note": ('', ''),
+    "cover_play": ("Игра от укрытий", "Cover and prefire"), "cover_note": ('Бот использует укрытия и стреляет из-за угла.', 'The bot uses cover and peeks to shoot.'),
     "afk_seconds": ("Пауза до AFK", "Inactivity timeout"), "gravity": ("Гравитация", "Gravity"), "air_acceleration": ("Ускорение в воздухе", "Air acceleration"),
-    "defaults": ("По умолчанию", "Reset defaults"), "settings_ready": ("Настройки сохранены в редакторе", "Your setup is ready"),
+    "defaults": ("По умолчанию", "Reset defaults"), "settings_ready": ('Настройки готовы', 'Settings ready'),
     "win_rate": ("Победы", "Win rate"), "motion": ("Анимация интерфейса", "Interface animations"), "repair": ("Обновить компоненты", "Update components"),
     "state_checking": ("Проверяю установку…", "Checking your setup…"), "state_idle": ("Готово к запуску", "Ready to start"),
     "state_not_installed": ("Нужна установка", "Ready to install"), "state_missing_game": ("Выбери папку TF2", "Choose your TF2 folder"),
     "state_starting": ("Запускаю TF2…", "Starting TF2…"), "state_waiting_map": ("Загружается локальная карта…", "Waiting for the local map…"),
-    "state_waiting_plugin": ("Подключаю локальный плагин…", "Connecting to the local plugin…"), "state_joining": ("Ожидаю вход игрока…", "Waiting for your player…"),
-    "state_connected": ("TF2 подключена", "Connected to TF2"), "state_secure_game": ("Нужен запуск с -insecure", "Restart TF2 with -insecure"),
+    "state_waiting_plugin": ('Подключение к тренировке…', 'Connecting to practice…'), "state_joining": ("Ожидаю вход игрока…", "Waiting for your player…"),
+    "state_connected": ("TF2 подключена", "Connected to TF2"), "state_secure_game": ('Перезапусти TF2 через приложение', 'Restart TF2 through the app'),
     "state_running_unknown": ("TF2 открыта · подключение ожидается", "TF2 is open · waiting to connect"),
-    "state_missing_plugin": ("Плагин не загружен", "The training plugin is not loaded"), "state_wrong_installation": ("Открыта другая установка TF2", "A different TF2 installation is running"),
+    "state_missing_plugin": ('Обнови компоненты для тренировки', 'Update the practice components'), "state_wrong_installation": ("Открыта другая установка TF2", "A different TF2 installation is running"),
     "state_map_changed": ("Карта меняется…", "The map is changing…"), "state_plugin_timeout": ("Игра загружается или приостановлена", "The game is loading or paused"),
-    "state_update_required": ("Обнови плагин тренировки", "Update the training plugin"),
+    "state_update_required": ('Обнови компоненты для тренировки', 'Update the practice components'),
     "state_error": ("Не удалось подключиться", "Connection needs attention"),
     "plan_waiting": ("План бота появится во время дуэли", "The bot's current plan appears during a duel"),
     "plan_fight": ("Бот: ведёт бой", "Bot plan: fight"), "plan_search": ("Бот: ищет путь к противнику", "Bot plan: find a route to the opponent"),
-    "plan_pressure": ("Бот: сближается с противником", "Bot plan: close the distance"), "plan_push_losing_exchange": ("Бот: пушит — проигрывает размен на дистанции", "Bot plan: push — losing the ranged exchange"),
+    "plan_pressure": ("Бот: сближается с противником", "Bot plan: close the distance"), "plan_push_losing_exchange": ('Бот идёт в атаку', 'The bot is pushing'),
     "plan_hold_high": ("Бот: удерживает высоту", "Bot plan: hold high ground"), "plan_rocket_jump": ("Бот: выполняет рокетджамп", "Bot plan: rocket jump"),
-    "learning_updates": ("Обновлений модели", "Model updates"), "learning_decisions": ("Решений", "Decisions"), "learning_disabled": ("Общее обучение выключено", "Shared learning is disabled"),
+    "learning_updates": ('Адаптация тактики', 'Tactical adaptation'), "learning_decisions": ("Решений", "Decisions"), "learning_disabled": ('Адаптация выключена', 'Adaptation off'),
 })
 
 
 COPY.update({
-    "bots_page": ("Настройки", "Training"), "bots_title": ("Тренируйся по своим правилам", "Make practice yours"),
-    "hero_ready": ("Ещё один раунд?", "One more round?"), "hero_install": ("Твоя арена. Твой темп.", "Your arena. Your pace."),
-    "hero_ready_note": ("Выбери арену, настрой соперника и начинай. Всё готово для тренировки на твоём компьютере.", "Pick an arena, tune your opponent and jump in. Your training runs on your computer."),
-    "hero_install_note": ("Карта, боты и компоненты — в одной установке. Играй один или позови друга на 2v2.", "Map, bots and components in one install. Train solo or bring a friend for 2v2."),
+    "bots_page": ("Настройки", "Training"), "bots_title": ('Настройки бота', 'Bot settings'),
+    "hero_ready": ('Тренировка MGE', 'MGE practice'), "hero_install": ('Тренировка MGE', 'MGE practice'),
+    "hero_ready_note": ('Выбери арену и начни дуэль.', 'Pick an arena and start a duel.'),
+    "hero_install_note": ('Установи компоненты и начни тренировку.', 'Install the components and start training.'),
     "mode_solo": ("1v1 · Один на один", "1v1 · Solo practice"), "mode_duo": ("2v2 · С напарником", "2v2 · With a teammate"),
-    "hero_duo": ("Вдвоём против ботов.", "Better with a teammate."),
-    "hero_duo_note": ("Создай комнату на своём компьютере и позови друга через Steam. Или добавь бота-напарника и играй сразу.", "Host a room on your computer and invite a Steam friend. Or add an AI teammate and play right away."),
+    "hero_duo": ('Тренировка 2v2', '2v2 practice'),
+    "hero_duo_note": ('Пригласи друга или добавь бота-напарника.', 'Invite a friend or add a bot teammate.'),
     "host_duo": ("Создать комнату 2v2", "Host 2v2"), "your_class": ("Твой класс", "Your class"),
     "room_access": ("Кто может подключиться", "Who can join"),
     "visibility_friends": ("Только друзья Steam", "Steam friends only"), "visibility_unlisted": ("По приглашению / адресу", "Unlisted · invite or address"), "visibility_listed": ("Все · показывать в списке серверов", "Anyone · list in server browser"),
@@ -137,26 +137,26 @@ COPY.update({
     "duo_round_out": ("Вы выбиты до следующего раунда", "You are out until the next round"),
     "duo_rules": ("До 20 побед · раунд до уничтожения команды", "First to 20 round wins · eliminate the entire team"),
     "duo_settings_note": ("В 2v2 раунд заканчивается после гибели команды. Здесь — сложность и денай; тактика, свитчган и Gunboats доступны в игровом меню настроек ботов.", "A 2v2 round ends when a team is eliminated. Set difficulty and air deny here; tactics, switchgun and Gunboats are in the in-game bot settings."),
-    "duo_empty": ("Создай комнату. Пригласи друга или добавь бота-напарника.", "Host a room. Invite a friend or add an AI teammate."),
-    "duo_team_preview": ("Ты + друг или бот\nпротив двух ботов со случайными классами", "You + a friend or AI\nvs. two bots with random classes"),
-    "add_bot_teammate": ("Добавить бота-напарника", "Add an AI teammate"),
+    "duo_empty": ("Создай комнату. Пригласи друга или добавь бота-напарника.", "Host a room. Invite a friend or add a bot teammate."),
+    "duo_team_preview": ('Ты и напарник против двух ботов', 'You and a teammate against two bots'),
+    "add_bot_teammate": ('Добавить бота-напарника', 'Add a bot teammate'),
     "adding_bot_teammate": ("Создаём команду…", "Creating your team…"),
-    "bot_teammate": ("Бот-напарник", "AI teammate"),
+    "bot_teammate": ('Бот-напарник', 'Bot teammate'),
     "waiting_partner": ("Комната создана · ждём напарника", "Room ready · waiting for your teammate"), "partner": ("Напарник", "Teammate"),
     "invite_friend": ("Открыть друзей Steam", "Open Steam friends"),
     "invite_note": ("Позови друга через Steam. Другу нужна та же карта — она есть в приложении. После входа: !add в чат → выбрать ту же арену. Комната работает, пока ты в игре.", "Invite your friend through Steam. Your friend needs the same map, included in this app. Once connected: !add in chat → choose the same arena. Keep your game open to host the room."),
     "reaction": ("Реакция", "Reaction"), "aim_delay": ("Задержка прицела", "Aim delay"), "random_reaction": ("Случайный пресет на раунд", "Random preset each round"),
-    "reaction_note": ("Добавочная задержка поворота прицела. Пресет выбирается по весу; разброс задаёт случайное отклонение. Нулевые веса возвращают фиксированную задержку.", "Additional aim-turn delay. Each round picks a preset by weight; variation adds a random offset. Zero weights use the fixed delay."),
+    "reaction_note": ('Больше задержка — медленнее реакция бота.', 'A longer delay makes the bot react more slowly.'),
     "shotgun_deny": ("Денай дробовиком в воздухе", "Shotgun air deny"),
-    "shotgun_deny_note": ("Разрешать солдату стрелять из дробовика по противнику в воздухе.", "Allow Soldier bots to use their shotgun against airborne opponents."),
-    "quickswitch": ("Быстрая смена после выстрела", "Switch weapons immediately after firing"), "quickswitch_note": ("Разрешать сразу переходить на вторичное оружие.", "Allow an immediate switch to the secondary weapon."),
+    "shotgun_deny_note": ('', ''),
+    "quickswitch": ("Быстрая смена после выстрела", "Switch weapons immediately after firing"), "quickswitch_note": ('', ''),
     "shotgun_stall": ("Вторичное вместо перезарядки", "Use secondary instead of reloading"), "shotgun_stall_note": ("Выключи, чтобы бот сначала дозарядил основное оружие.", "Turn off to make the bot finish reloading its primary first."),
-    "spawn_grace": ("Секунда перед стрельбой", "One-second spawn grace"), "spawn_grace_note": ("Пауза после появления: 1 с; при выключении — 0,5 с.", "Fire delay after spawning: 1 s, or 0.5 s when off."),
+    "spawn_grace": ("Секунда перед стрельбой", "One-second spawn grace"), "spawn_grace_note": ('Бот ждёт секунду перед стрельбой.', 'The bot waits one second before firing.'),
     "wait_soldier": ("Солдат ждёт твоего действия", "Soldier waits for your move"), "wait_soldier_note": ("В дуэли двух солдатов бот ждёт твоего сближения, прыжка или выстрела.", "In Soldier-versus-Soldier practice, wait until you approach, jump or fire."),
     "infinite_player": ("Моя неуязвимость", "Player invulnerability"), "infinite_bot": ("Неуязвимость бота", "Bot invulnerability"),
-    "infinite_health_note": ("Практика без обычного обучения тактик.", "Practice excluded from normal tactical learning."),
+    "infinite_health_note": ('Результаты не идут в личные рекорды.', 'Results do not count toward personal bests.'),
     "ammo_policy": ("Правила патронов", "Ammo rules"), "individual_ammo": ("Отдельно для игрока и бота", "Individual player / bot toggles"), "infinite_ammo_both": ("Бесконечные у обоих", "Infinite for both"),
-    "respawn_sound": ("Звук возрождения MGE", "MGE respawn sound"), "respawn_sound_note": ("Оригинальный звук в точке появления игрока или бота.", "The original sound at the player's or bot's spawn position."),
+    "respawn_sound": ("Звук возрождения MGE", "MGE respawn sound"), "respawn_sound_note": ('', ''),
     "standard": ("Правила арены", "Arena rules"), "classic20": ("300 HP · до 20", "300 HP · first to 20"), "classic50": ("300 HP · до 50", "300 HP · first to 50"), "classic_unlimited": ("300 HP · без лимита", "300 HP · unlimited"),
     "no_session": ("Начни тренировку. Здесь появятся счёт и здоровье участников.", "Start training to see the score and participant health."),
     "select_game": ("Выбери папку TF2 в настройках приложения.", "Choose the TF2 folder in app settings."),
@@ -164,8 +164,29 @@ COPY.update({
 for _number in range(1, 4):
     COPY[f"preset_{_number}_delay"] = (f"Пресет {_number} · задержка", f"Preset {_number} · delay")
     COPY[f"preset_{_number}_jitter"] = (f"Пресет {_number} · разброс ±", f"Preset {_number} · variation ±")
-    COPY[f"preset_{_number}_weight"] = (f"Пресет {_number} · вес", f"Preset {_number} · weight")
+    COPY[f"preset_{_number}_weight"] = (f"Пресет {_number} · частота", f"Preset {_number} · frequency")
 
+COPY.update({
+    "personal_bot": ("Личный бот", "Personal bot"),
+    "training_map": ("Карта тренировки", "Training map"),
+    "bot_name": ("Имя бота", "Bot name"), "random_name": ("Случайное имя", "Random name"),
+    "bot_name_note": ('', ''),
+    "mirror_gear": ("Копировать мою экипировку", "Copy my equipment"),
+    "mirror_gear_note": ('Для одинаковых классов.', 'For matching classes.'),
+    "backstab_only": ("Spy: только бэкстабы", "Spy: backstabs only"),
+    "backstab_only_note": ('', ''),
+    "alternate_soldier": ("Bad Mid: прыжки по очереди", "Bad Mid: take turns jumping"),
+    "alternate_soldier_note": ("После своей смерти бот прыгает к твоему вагону. После победы защищает свой.", "After dying, jump to your train. After winning, defend the current train."),
+    "primary_item": ("Основное оружие бота", "Bot primary weapon"),
+    "secondary_item": ("Вторичное оружие бота", "Bot secondary weapon"),
+    "melee_item": ("Ближний бой бота", "Bot melee weapon"),
+    "default_loadout": ('По сложности', 'Difficulty default'),
+    "respawn_delay": ("Задержка возрождения", "Respawn delay"),
+    "respawn_delay_note": ('Ноль — сразу после смерти.', 'Zero respawns immediately.'),
+})
+
+
+COPY.update({'download_components': ('Загрузка компонентов…', 'Downloading components…'), 'error_retry': ('Не получилось. Попробуй ещё раз.', 'Something went wrong. Try again.'), 'error_close_game': ('Закрой TF2 и повтори установку.', 'Close TF2 and try installing again.'), 'error_preset': ('Не удалось открыть пресет. Выбери другой файл.', 'Could not open the preset. Choose another file.'), 'error_name_long': ('Сократи имя бота.', 'Use a shorter bot name.'), 'error_name_chars': ('Убери из имени специальные символы.', 'Remove special characters from the name.'), 'error_settings': ('Проверь настройки или верни значения по умолчанию.', 'Check your settings or reset them to defaults.'), 'error_package': ('Не удалось проверить установочные файлы. Скачай архив заново.', 'Could not verify the installation files. Download the archive again.'), 'error_connection': ('Нет связи с TF2. Открой игру и попробуй ещё раз.', 'Cannot reach TF2. Open the game and try again.'), 'error_support': ('Обновление не завершено. Обратись в поддержку.', 'The update could not finish. Contact support.')})
 
 for _key, _values in tuple(COPY.items()):
     COPY[_key] = tuple(value if value.startswith(("TF2", "Team Fortress", "Steam", "SourceMod", "MetaMod", "Gunboats", "MGE", "HP", "DPM", "A/D", "Windows", "Linux", "JSON"))
@@ -176,3 +197,27 @@ CLASSES_RU = {1: "Скаут", 3: "Солдат", 7: "Поджигатель", 4
 
 def text(key: str, language: str = "en") -> str:
     return COPY[key][0 if language == "ru" else 1]
+
+
+def error_text(message: str, language: str = "en") -> str:
+
+    message = str(message)
+    for pair in COPY.values():
+        localized = pair[0 if language == "ru" else 1]
+        if localized and (message == localized or message.endswith(": " + localized)):
+            return localized
+    value = message.casefold()
+    rules = [
+        (("bot name is too long", "31 utf-8"), "error_name_long"),
+        (("bot name",), "error_name_chars"),
+        (("close tf2", "tf2 started during", "live plugin replacement"), "error_close_game"),
+        (("user-modified files", "changed during installation", "recovery journal"), "error_support"),
+        (("preset file", "preset format", "unsupported preset fields"), "error_preset"),
+        (("invalid practice", "invalid number", "invalid value", "expected ", "requires soldier", "requires sniper", "this exercise", "unsupported regeneration", "invalid loadout", "invalid ammo", "allowed range"), "error_settings"),
+        (("package", "manifest", "sha256", "sha-256", "checksum"), "error_package"),
+        (("rcon", "connection", "timed out", "timeout", "protocol", "not connected"), "error_connection"),
+    ]
+    for patterns, key in rules:
+        if any(pattern in value for pattern in patterns):
+            return text(key, language)
+    return text("error_retry", language)

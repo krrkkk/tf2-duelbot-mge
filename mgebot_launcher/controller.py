@@ -51,6 +51,8 @@ class Controller(QObject):
         self.watched_game = None
         self.cancel = threading.Event()
         self.catalog = json.loads((Path(__file__).parent / "dependencies.json").read_text())
+        self.training_map = window.training_map
+        window.map_changed.connect(self.change_map)
         self.payload = Path(window.payload) if window.payload else Path(__file__).parent / "payload/plugin.zip"
         self.payload_manifest = None
         if self.payload.is_file():
@@ -95,6 +97,11 @@ class Controller(QObject):
         self.window.game_directory = directory; self.window.install_ready = False
         self.window.show_snapshot({}); self.window.set_connection_state("checking"); self.discover()
 
+    def change_map(self, map_name):
+        if map_name not in ("mge_triumph_beta7_rc1", "mge_league_v5"): return
+        self.training_map = map_name
+        self._offline_arenas()
+
     def _installed(self, tf):
         if not self.payload_manifest or not load_file_connection(tf): return False
         critical = ["tf/addons/sourcemod/plugins/mge_botduel.smx", "tf/addons/sourcemod/plugins/mgebot_companion.smx"]
@@ -102,7 +109,7 @@ class Controller(QObject):
         for name in critical:
             spec = self.payload_manifest.get("files", {}).get(name); path = tf.parent / name
             if not spec or not path.is_file() or digest(path) != spec["sha256"]: return False
-        return (tf / ("maps/" + self.catalog["map"] + ".bsp")).is_file() and (tf / "addons/sourcemod/configs/databases.cfg").is_file()
+        return (tf / ("maps/" + self.training_map + ".bsp")).is_file() and (tf / "addons/sourcemod/configs/databases.cfg").is_file()
 
     def discover(self):
         if self.demo or self.discovering or self.window.busy: return
@@ -147,7 +154,11 @@ class Controller(QObject):
         file = self.tf_directory / "addons/sourcemod/configs/mgemod_spawns.cfg"
         try:
             document = parse_vdf(file.read_text(encoding="utf-8-sig")); maps = next(iter(document.values()))
-            arenas = maps.get(self.catalog["map"], {})
+            arenas = maps.get(self.training_map, {})
+            if not arenas:
+                fallback = self.tf_directory / "addons/sourcemod/configs/botduel_maps" / (self.training_map + ".cfg")
+                values = next(iter(parse_vdf(fallback.read_text(encoding="utf-8-sig")).values()))
+                arenas = values.get(self.training_map, {})
             self.window.set_arenas([{"id": i + 1, "name": str(value.get("name", name)), "occupied": False, "duo": len([k for k in value if str(k).isdigit()]) >= 4 and str(value.get("endif", "0")) == "0" and str(value.get("midair", "0")) == "0" and (not value.get("classes") or {"scout", "soldier", "demoman"}.issubset(str(value["classes"]).lower().split()))}
                                    for i, (name, value) in enumerate(arenas.items()) if isinstance(value, dict)])
         except (OSError, ValueError, AttributeError, StopIteration): pass
@@ -179,7 +190,7 @@ class Controller(QObject):
             self.window.notify(self.window.t("installed"))
             if live and game:
                 self.last_bootstrap = time.monotonic()
-                self.submit(lambda progress: launch_training(27025, self.catalog["map"], tf, game, bootstrap_only=True, refresh=True))
+                self.submit(lambda progress: launch_training(27025, self.training_map, tf, game, bootstrap_only=True, refresh=True))
             QTimer.singleShot(400, self.poll)
         platform = "windows" if sys.platform == "win32" else "linux"
         self.submit(lambda progress: installer.install(tf, payload, platform, progress, self.cancel, allow_running_local=live),
@@ -246,20 +257,25 @@ class Controller(QObject):
         if not self.pending_launch: return
         pending = self.pending_launch; now = time.monotonic()
         if now > pending["deadline"]:
-            self.pending_launch = None; self.window.set_launch_pending(False); self.window.notify(self.window.t("connect_first") + " " + self.last_error, True); return
+            self.pending_launch = None; self.window.set_launch_pending(False); self.window.notify(self.window.t("connect_first"), True); return
 
 
         if allow_bootstrap and pending.get("bootstrap") and now - pending["started"] > 3.5 and self.game:
             pending["bootstrap"] = False
-            self.submit(lambda progress: launch_training(27025, self.catalog["map"], self.tf_directory, self.game, visibility=pending["visibility"]))
+            self.submit(lambda progress: launch_training(27025, self.training_map, self.tf_directory, self.game, visibility=pending["visibility"]))
 
     def _apply(self, settings: BotSettings, arena: int | None = None, environment: SessionSettings | None = None, practice=None, mode=None, player_class=None):
         if not self.connection or not self.userid:
             self.window.notify(self.window.t("connect_first"), True); return
         if self.action_busy or self.demo: return
+        try:
+            environment = environment or self.window.session_settings()
+            practice = practice or self.window.practice_settings()
+        except ValueError as error:
+            self.error(error); return
         self.action_busy = True; self.window.set_action_busy(True)
-        environment = environment or self.window.session_settings(); userid = self.userid
-        practice = practice or self.window.practice_settings(); mode = mode or self.window.mode
+        userid = self.userid
+        mode = mode or self.window.mode
         player_class = player_class or self.window.host_class
         connection = self.connection; tf = self.tf_directory; generation = self.generation
         def work(progress):
@@ -289,17 +305,21 @@ class Controller(QObject):
 
     def launch(self, settings, arena):
         if self.demo or self.action_busy or self.pending_launch: return
+        try:
+            practice = self.window.practice_settings(); environment = self.window.session_settings()
+        except ValueError as error:
+            self.error(error); return
         visibility = self.window.visibility if self.window.mode == "duo" else "local"
         hosting = self.window.last_snapshot.get("hosting") or {}
         network_ready = hosting_matches(visibility, hosting)
-        if self.connection and self.userid and self.window.online and network_ready:
+        if self.connection and self.userid and self.window.online and network_ready and self.last_map == self.training_map:
             self._apply(settings, arena); return
         if not self.connection or not self.tf_directory:
             self.window._select_page(0); self.window.notify(self.window.t("select_game"), True); return
         game = self.game
         if game and game.insecure is not True:
             self.window.set_connection_state("secure_game"); self.window.notify(self.window.t("local_launch_note"), True); return
-        self.pending_launch = {"settings": settings, "environment": self.window.session_settings(), "arena": arena, "practice": self.window.practice_settings(), "mode": self.window.mode, "player_class": self.window.host_class, "visibility": visibility,
+        self.pending_launch = {"settings": settings, "environment": environment, "arena": arena, "practice": practice, "mode": self.window.mode, "player_class": self.window.host_class, "visibility": visibility,
                                "deadline": time.monotonic() + 120, "started": time.monotonic(), "bootstrap": bool(game)}
         self.window.set_launch_pending(True)
         self.window.set_connection_state("starting")
@@ -307,7 +327,7 @@ class Controller(QObject):
         except OSError as error: logging.warning("TF2 crash recorder: %s", error)
         def failed(error):
             self.pending_launch = None; self.window.set_launch_pending(False); self.window.set_connection_state("error", str(error)); self.error(error)
-        self.submit(lambda progress: launch_training(27025, self.catalog["map"], self.tf_directory, game, bootstrap_only=False, visibility=visibility),
+        self.submit(lambda progress: launch_training(27025, self.training_map, self.tf_directory, game, bootstrap_only=False, visibility=visibility),
                     lambda _: QTimer.singleShot(400, self.poll), failed)
 
     def add_teammate(self):
